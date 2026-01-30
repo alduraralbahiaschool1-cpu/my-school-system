@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المنظومة المالية المدرسية | الإصدار الشامل</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { --font-main: 'Tajawal', sans-serif; }
+        body { font-family: var(--font-main); background-color: #f0f4f8; overflow-x: hidden; }
+        
+        /* UI Elements */
+        .input-std { @apply w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold text-slate-700; }
+        .btn-main { @apply bg-indigo-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-95; }
+        .dash-card { transition: all 0.4s; }
+        .dash-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.15); }
+        
+        /* Animations */
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Flash Year */
+        #year-flash { animation: zoomFade 3s forwards; }
+        @keyframes zoomFade { 
+            0% { opacity: 0; transform: scale(0.5); } 
+            20% { opacity: 1; transform: scale(1); } 
+            80% { opacity: 1; transform: scale(1); } 
+            100% { opacity: 0; transform: scale(1.5); pointer-events: none; visibility: hidden; } 
+        }
+
+        /* Print Logic (Strict A5) */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+            @page { size: A5 landscape; margin: 0; }
+            .no-print { display: none !important; }
+        }
+        
+        /* Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* PIN Dots */
+        .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #94a3b8; transition: all 0.2s; }
+        .pin-dot.active { background-color: #4f46e5; border-color: #4f46e5; transform: scale(1.3); }
+    </style>
+</head>
+<body class="text-slate-800 h-screen flex flex-col">
+
+    <!-- 1. SPLASH SCREEN (Academic Year) -->
+    <div id="year-splash" class="fixed inset-0 z-[100] bg-slate-900 flex items-center justify-center hidden">
+        <div id="year-flash" class="text-center text-white">
+            <p class="text-2xl opacity-70 mb-2">العام الدراسي الحالي</p>
+            <h1 id="splash-year-text" class="text-8xl font-black text-indigo-400">2025-2026</h1>
+        </div>
+    </div>
+
+    <!-- 2. GOOGLE LOGIN -->
+    <div id="view-google-login" class="fixed inset-0 z-[60] bg-slate-900 flex flex-col items-center justify-center p-6 text-center">
+        <div class="bg-white p-12 rounded-[3rem] shadow-2xl max-w-md w-full fade-in">
+            <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center text-4xl mb-6 mx-auto text-indigo-600">☁️</div>
+            <h1 class="text-3xl font-black text-slate-800 mb-2">المنظومة السحابية</h1>
+            <p class="text-slate-500 mb-8">تسجيل الدخول للمزامنة</p>
+            <button onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-4 bg-white border-2 border-slate-200 hover:bg-indigo-50 text-slate-700 font-bold py-4 px-6 rounded-2xl transition group">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6 group-hover:scale-110">
+                <span>دخول بحساب Google</span>
+            </button>
+            <p id="login-status" class="mt-6 text-sm text-indigo-600 font-black animate-pulse hidden">جاري الاتصال...</p>
+        </div>
+    </div>
+
+    <!-- 3. PIN LOGIN -->
+    <div id="view-pin-login" class="hidden fixed inset-0 z-50 bg-slate-900 flex items-center justify-center p-6">
+        <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="space-y-8 text-white">
+                <div>
+                    <div class="flex items-center gap-3 mb-4 opacity-80">
+                        <span class="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></span>
+                        <span class="text-sm font-mono" id="cloud-email-display">...</span>
+                        <button onclick="fullLogout()" class="text-xs bg-white/10 px-2 py-1 rounded text-rose-300">خروج</button>
+                    </div>
+                    <h1 class="text-6xl font-black mb-4">المنظومة<br><span class="text-indigo-400">الشاملة</span></h1>
+                    <p class="text-slate-400 text-xl">العام الدراسي: <span id="login-active-year" class="text-white font-bold">...</span></p>
+                </div>
+                <div class="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-3xl">
+                    <h3 class="font-bold mb-4 text-indigo-200">اختر المستخدم:</h3>
+                    <div id="login-users-container" class="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto custom-scroll"></div>
+                </div>
+            </div>
+            <div id="pin-pad-area" class="bg-white/10 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] opacity-50 pointer-events-none transition-all">
+                <p id="pin-target-name" class="text-center text-white font-bold mb-6 text-xl">أدخل الرمز</p>
+                <div class="flex justify-center gap-4 mb-8"><div class="pin-dot" id="pd-1"></div><div class="pin-dot" id="pd-2"></div><div class="pin-dot" id="pd-3"></div><div class="pin-dot" id="pd-4"></div></div>
+                <div class="grid grid-cols-3 gap-4">
+                    <button onclick="typePin('1')" class="h-20 rounded-3xl bg-white/5 text-white text-3xl font-bold hover:bg-white/20">1</button>
+                    <button onclick="typePin('2')" class="h-20 rounded-3xl bg-white/5 text-white text-3xl font-bold hover:bg-white/20">2</button>
+                    <button onclick="typePin('3')" class="h-20 rounded-3xl bg-white/5 text-white text-3xl font-bold hover:bg-white/20">3</button>
+                    <button onclick="typePin('4')" class="h-20 rounded-3xl bg-white/5 text-white text-3xl font-bold hover:bg-white/20">4</button>
+                    <button onclick="typePin('5')" class="h-20 rounded-3xl bg-white/5 text-white text-3xl font-bold hover:bg-white/20">5</button>
+                    <button onclick="typePin('6')" class="h-20 rounded-3xl bg-white/5 text-white text-3xl font-bold hover:bg-white/20">6</button>
+                    <button onclick="typePin('7')" class="h-20 rounded-3xl bg-white/5 text-white text-3xl font-bold hover:bg-white/20">7</button>
+                    <button onclick="typePin('8')" class="h-20 rounded-3xl bg-white/5 text-white text-3xl font-bold hover:bg-white/20">8</button>
+                    <button onclick="typePin('9')" class="h-20 rounded-3xl bg-white/5 text-white text-3xl font-bold hover:bg-white/20">9</button>
+                    <button onclick="clearPin()" class="h-20 rounded-3xl bg-rose-500/20 text-rose-400 text-xl font-bold">C</button>
+                    <button onclick="typePin('0')" class="h-20 rounded-3xl bg-white/5 text-white text-3xl font-bold hover:bg-white/20">0</button>
+                    <button onclick="submitPin()" class="h-20 rounded-3xl bg-indigo-600 text-white text-xl font-bold">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. DASHBOARD HUB -->
+    <div id="view-dashboard" class="hidden min-h-screen flex flex-col p-6 md:p-8 relative">
+        <!-- Navbar -->
+        <header class="flex justify-between items-center mb-8 bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100">
+            <div class="flex items-center gap-5">
+                <div class="w-16 h-16 bg-slate-50 rounded-2xl border flex items-center justify-center overflow-hidden">
+                    <img id="dash-logo" src="" class="w-full h-full object-contain hidden">
+                    <span id="dash-logo-placeholder" class="text-3xl">🏫</span>
+                </div>
+                <div>
+                    <h1 id="dash-school-name" class="text-xl font-black text-slate-800">...</h1>
+                    <p class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded w-fit mt-1" id="dash-year">...</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleFullScreen()" class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center hover:bg-slate-200"><i class="fa-solid fa-expand"></i></button>
+                <button onclick="userLogout()" class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white"><i class="fa-solid fa-power-off"></i></button>
+            </div>
+        </header>
+
+        <!-- Grid -->
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 pb-10">
+            <div onclick="nav('receipts')" class="dash-card bg-emerald-500 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden flex flex-col justify-between shadow-xl h-56">
+                <i class="fa-solid fa-file-invoice-dollar text-6xl opacity-20 absolute top-4 left-4"></i>
+                <h2 class="text-3xl font-black relative z-10">سند قبض</h2>
+            </div>
+            <div onclick="nav('payments')" class="dash-card bg-rose-500 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden flex flex-col justify-between shadow-xl h-56">
+                <i class="fa-solid fa-money-bill-wave text-6xl opacity-20 absolute top-4 left-4"></i>
+                <h2 class="text-3xl font-black relative z-10">سند دفع</h2>
+            </div>
+            <div onclick="nav('parents')" class="dash-card bg-indigo-600 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden flex flex-col justify-between shadow-xl h-56">
+                <i class="fa-solid fa-users text-6xl opacity-20 absolute top-4 left-4"></i>
+                <h2 class="text-3xl font-black relative z-10">أولياء الأمور</h2>
+            </div>
+            <div onclick="nav('reports')" class="dash-card bg-amber-500 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden flex flex-col justify-between shadow-xl h-56">
+                <i class="fa-solid fa-chart-pie text-6xl opacity-20 absolute top-4 left-4"></i>
+                <h2 class="text-3xl font-black relative z-10">التقارير</h2>
+            </div>
+            <!-- NEW TAB: OTHERS -->
+            <div onclick="nav('others')" class="dash-card bg-cyan-600 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden flex flex-col justify-between shadow-xl h-56">
+                <i class="fa-solid fa-folder-open text-6xl opacity-20 absolute top-4 left-4"></i>
+                <div class="relative z-10">
+                    <h2 class="text-3xl font-black">أخرى</h2>
+                    <p class="text-sm opacity-90">السجلات، الإغلاق اليومي</p>
+                </div>
+            </div>
+            <div id="btn-settings-dash" onclick="nav('settings')" class="dash-card bg-slate-800 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden flex flex-col justify-between shadow-xl h-56">
+                <i class="fa-solid fa-gears text-6xl opacity-20 absolute top-4 left-4"></i>
+                <h2 class="text-3xl font-black relative z-10">الإعدادات</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. MODULES CONTAINER -->
+    <div id="view-modules" class="hidden min-h-screen flex flex-col bg-slate-100">
+        <div class="bg-white px-8 py-4 shadow-sm border-b border-slate-200 flex justify-between items-center sticky top-0 z-40 no-print">
+            <h2 id="module-title" class="text-2xl font-black text-slate-800">---</h2>
+            <button onclick="goHome()" class="flex items-center gap-2 bg-slate-800 text-white px-6 py-2 rounded-xl font-bold hover:bg-black transition"><span>الرئيسية</span> <i class="fa-solid fa-house"></i></button>
+        </div>
+
+        <div class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full custom-scroll overflow-y-auto">
+
+            <!-- A. PARENTS -->
+            <div id="mod-parents" class="module-view hidden space-y-8 fade-in">
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm">
+                    <h3 class="text-xl font-bold mb-4 text-indigo-600">تسجيل عائلة</h3>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <input type="text" id="p-name" class="input-std" placeholder="اسم ولي الأمر">
+                        <input type="tel" id="p-phone" class="input-std font-mono" placeholder="رقم الهاتف">
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl mb-4 border">
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" id="s-name" placeholder="الطالب" class="input-std text-sm">
+                            <select id="s-grade" class="input-std text-sm"></select>
+                            <button onclick="addTempStudent()" class="bg-indigo-600 text-white px-4 rounded-xl font-bold">+</button>
+                        </div>
+                        <div id="temp-students-list" class="space-y-1"></div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <p class="font-bold text-slate-500">الإجمالي: <span id="p-total" class="text-indigo-600 text-xl">0</span></p>
+                        <button onclick="saveFamily()" class="btn-main">حفظ</button>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm">
+                    <div class="flex justify-between mb-4">
+                        <h3 class="font-bold">السجلات</h3>
+                        <input oninput="filterParents(this.value)" placeholder="بحث..." class="border p-2 rounded-lg text-sm">
+                    </div>
+                    <table class="w-full text-right text-sm"><thead class="bg-slate-100"><tr><th class="p-3">الاسم</th><th class="p-3">الهاتف</th><th class="p-3">الطلاب</th><th class="p-3">الرسوم</th><th class="p-3">تعديل</th></tr></thead><tbody id="parents-list"></tbody></table>
+                </div>
+            </div>
+
+            <!-- B. RECEIPTS -->
+            <div id="mod-receipts" class="module-view hidden fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 no-print">
+                    <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-emerald-100">
+                        <h3 class="text-xl font-black text-emerald-600 mb-6">سند قبض</h3>
+                        <div class="relative mb-6">
+                            <input type="text" id="rec-search" oninput="searchParent(this.value)" placeholder="ابحث عن ولي الأمر..." class="input-std">
+                            <div id="rec-results" class="absolute w-full bg-white shadow-xl rounded-xl mt-1 max-h-40 overflow-y-auto z-20 hidden border"></div>
+                        </div>
+                        <div id="rec-info" class="hidden bg-emerald-50 p-4 rounded-xl mb-4 border border-emerald-100">
+                            <h4 id="rec-p-name" class="font-bold text-emerald-900"></h4>
+                            <p class="text-sm">المتبقي: <span id="rec-p-debt" class="font-bold text-rose-500"></span></p>
+                        </div>
+                        <input type="number" id="rec-amount" placeholder="المبلغ" class="input-std mb-4 text-2xl font-black text-emerald-600">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <select id="rec-method" class="input-std"><option>نقداً</option><option>صك</option><option>تحويل</option></select>
+                            <input type="text" id="rec-ref" placeholder="رقم مرجعي" class="input-std">
+                        </div>
+                        <button onclick="printReceipt()" class="btn-main w-full bg-emerald-600 hover:bg-emerald-700">طباعة A5</button>
+                    </div>
+                    <div class="bg-white p-8 rounded-[2rem] shadow-sm">
+                        <h3 class="font-bold mb-4">أحدث السندات</h3>
+                        <ul id="rec-recent" class="space-y-3"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- C. PAYMENTS -->
+            <div id="mod-payments" class="module-view hidden fade-in">
+                <div class="max-w-2xl mx-auto bg-white p-10 rounded-[2rem] shadow-xl border border-rose-100 no-print">
+                    <h3 class="text-xl font-black text-rose-600 mb-6">سند صرف</h3>
+                    <input type="text" id="pay-to" placeholder="يصرف لـ..." class="input-std mb-4">
+                    <input type="number" id="pay-amount" placeholder="المبلغ" class="input-std mb-4 text-2xl font-black text-rose-600">
+                    <input type="text" id="pay-reason" placeholder="مقابل..." class="input-std mb-4">
+                    <select id="pay-cat" class="input-std mb-6"><option>رواتب</option><option>صيانة</option><option>نثريات</option></select>
+                    <button onclick="printPayment()" class="btn-main w-full bg-rose-600 hover:bg-rose-700">صرف وطباعة</button>
+                </div>
+            </div>
+
+            <!-- D. REPORTS -->
+            <div id="mod-reports" class="module-view hidden fade-in">
+                <div class="grid grid-cols-3 gap-4 mb-6 no-print">
+                    <div class="bg-white p-6 rounded-2xl border"><p class="text-xs text-slate-400 font-bold">مقبوضات</p><h2 id="rep-in" class="text-2xl font-black text-emerald-600">0</h2></div>
+                    <div class="bg-white p-6 rounded-2xl border"><p class="text-xs text-slate-400 font-bold">مصروفات</p><h2 id="rep-out" class="text-2xl font-black text-rose-600">0</h2></div>
+                    <div class="bg-white p-6 rounded-2xl border"><p class="text-xs text-slate-400 font-bold">ديون</p><h2 id="rep-debt" class="text-2xl font-black text-slate-800">0</h2></div>
+                </div>
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm">
+                    <div class="flex justify-between mb-4 no-print">
+                        <h3 class="font-bold">الديون التفصيلية</h3>
+                        <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm">طباعة</button>
+                    </div>
+                    <table class="w-full text-right text-sm"><thead class="bg-slate-100"><tr><th>الاسم</th><th>الهاتف</th><th>المتبقي</th></tr></thead><tbody id="rep-table"></tbody></table>
+                </div>
+            </div>
+
+            <!-- E. OTHERS (NEW REQUEST) -->
+            <div id="mod-others" class="module-view hidden fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Records (السجلات) -->
+                    <div class="lg:col-span-2 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-6 no-print">
+                            <h3 class="font-bold text-xl text-cyan-700">📚 السجلات الشاملة (الفواتير)</h3>
+                            <input oninput="filterRecords(this.value)" placeholder="بحث في السجلات..." class="p-2 border rounded w-64">
+                        </div>
+                        <div class="max-h-96 overflow-y-auto custom-scroll">
+                            <table class="w-full text-right text-sm">
+                                <thead class="bg-slate-50 sticky top-0"><tr><th class="p-3">#</th><th class="p-3">النوع</th><th class="p-3">الاسم/البيان</th><th class="p-3">المبلغ</th><th class="p-3">التاريخ</th><th class="p-3">بواسطة</th></tr></thead>
+                                <tbody id="records-body" class="divide-y"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Daily Closing -->
+                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200 h-fit">
+                        <h3 class="font-bold text-xl mb-4 text-indigo-900">🔒 الإغلاق اليومي</h3>
+                        <div id="daily-summary" class="bg-slate-50 p-4 rounded-xl mb-4 space-y-2 border">
+                            <div class="flex justify-between"><span>وارد اليوم:</span><span id="daily-in" class="font-bold text-emerald-600">0</span></div>
+                            <div class="flex justify-between"><span>صادر اليوم:</span><span id="daily-out" class="font-bold text-rose-600">0</span></div>
+                            <div class="flex justify-between border-t pt-2"><span>الصافي:</span><span id="daily-net" class="font-black">0</span></div>
+                        </div>
+                        <button onclick="printDailyReport()" class="btn-main w-full bg-slate-800">طباعة تقرير اليوم</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- F. SETTINGS -->
+            <div id="mod-settings" class="module-view hidden fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- General & Logo -->
+                    <div class="bg-white p-8 rounded-[2rem] shadow-sm">
+                        <h3 class="font-bold text-lg mb-4">بيانات المدرسة</h3>
+                        <input id="set-name" class="input-std mb-2" placeholder="الاسم">
+                        <input type="file" onchange="uploadLogo(this)" class="text-sm mb-4">
+                        <button onclick="saveSettings()" class="btn-main w-full py-2 text-sm">حفظ</button>
+                    </div>
+                    
+                    <!-- Year Management (New) -->
+                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-indigo-100">
+                        <h3 class="font-bold text-lg mb-4 text-indigo-700">📅 العام الدراسي</h3>
+                        <div class="flex gap-2 mb-4">
+                            <input id="new-year-input" placeholder="مثلاً: 2026-2027" class="input-std text-sm">
+                            <button onclick="changeYear()" class="bg-indigo-600 text-white px-4 rounded-xl font-bold text-sm">تغيير</button>
+                        </div>
+                        <button onclick="promoteStudents()" class="w-full bg-amber-500 text-white py-3 rounded-xl font-bold text-sm mb-2 hover:bg-amber-600">🎓 ترحيل الطلبة للعام الجديد</button>
+                        <p class="text-[10px] text-slate-400">عند الترحيل، يتم نقل الطلبة للسنة الجديدة وزيادة صفهم (مثلاً: أول -> ثاني).</p>
+                    </div>
+
+                    <!-- Backup -->
+                    <div class="bg-white p-8 rounded-[2rem] shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 text-blue-700">💾 النسخ الاحتياطي</h3>
+                        <div class="flex gap-2">
+                            <button onclick="exportJSON()" class="flex-1 bg-blue-100 text-blue-700 py-2 rounded-xl font-bold text-sm">تصدير (Backup)</button>
+                            <button onclick="document.getElementById('restore-file').click()" class="flex-1 bg-orange-100 text-orange-700 py-2 rounded-xl font-bold text-sm">استرداد</button>
+                            <input type="file" id="restore-file" class="hidden" onchange="importJSON(this)">
+                        </div>
+                    </div>
+
+                    <!-- Users & Grades -->
+                    <div class="bg-white p-8 rounded-[2rem] shadow-sm lg:col-span-2">
+                        <div class="grid grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-bold mb-2">الصفوف والأسعار</h4>
+                                <div class="flex gap-2 mb-2"><input id="g-name" placeholder="الصف" class="border p-1 w-1/2"><input id="g-price" placeholder="السعر" class="border p-1 w-1/3"><button onclick="addGrade()" class="bg-emerald-500 text-white px-2 rounded">+</button></div>
+                                <ul id="grades-list" class="text-sm space-y-1 max-h-32 overflow-y-auto"></ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold mb-2">المستخدمين</h4>
+                                <div class="flex gap-2 mb-2"><input id="u-name" placeholder="الاسم" class="border p-1 w-1/3"><input id="u-pin" placeholder="الرمز" class="border p-1 w-1/3"><button onclick="addUser()" class="bg-slate-800 text-white px-2 rounded">+</button></div>
+                                <ul id="users-list" class="text-sm space-y-1 max-h-32 overflow-y-auto"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-parent" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[70] p-4 flex">
+        <div class="bg-white w-full max-w-2xl rounded-3xl p-8 relative shadow-2xl">
+            <button onclick="closeModal()" class="absolute top-4 left-4 text-2xl text-rose-500">×</button>
+            <h3 class="text-xl font-bold mb-4">تعديل بيانات ولي الأمر</h3>
+            <input id="mod-p-name" class="input-std mb-2">
+            <input id="mod-p-phone" class="input-std mb-4">
+            <div id="mod-students" class="space-y-2 mb-4 max-h-40 overflow-y-auto"></div>
+            <div class="flex gap-2">
+                <button onclick="saveParentEdit()" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold">حفظ</button>
+                <button onclick="deleteParent()" class="px-4 bg-rose-100 text-rose-600 rounded-xl font-bold">حذف العائلة</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="print-area"></div>
+
+    <!-- LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPdIGZ-V1efsO4Ohzq6ioRoBR4YyDzQb0",
+            authDomain: "schoolsystem-7be7a.firebaseapp.com",
+            projectId: "schoolsystem-7be7a",
+            storageBucket: "schoolsystem-7be7a.firebasestorage.app",
+            messagingSenderId: "191775387521",
+            appId: "1:191775387521:web:9009678837327f697d8280",
+            measurementId: "G-2CYFSWKG2S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const dbCloud = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // Data Structure
+        window.appData = {
+            settings: { schoolName: 'المدرسة', logo: '', activeYear: '2025-2026', users: [{id:1, name:'مدير', pin:'1111', role:'admin'}] },
+            years: {} // Will hold data per year: { '2025-2026': { parents:[], transactions:[], grades:[] } }
+        };
+
+        let currentYearData = null; // Pointer to current year object
+        let currentUser = null;
+        let pinBuffer = "";
+        let tempStudents = [];
+        let editParentId = null;
+
+        // --- 1. AUTH & INIT ---
+        window.signInWithGoogle = () => {
+            document.getElementById('login-status').classList.remove('hidden');
+            signInWithPopup(auth, provider).catch(e => alert(e.message));
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if(user) {
+                document.getElementById('view-google-login').classList.add('hidden');
+                document.getElementById('view-pin-login').classList.remove('hidden');
+                document.getElementById('cloud-email-display').innerText = user.email;
+                await loadCloudData(user.email);
+            } else {
+                document.getElementById('view-google-login').classList.remove('hidden');
+                document.getElementById('view-pin-login').classList.add('hidden');
+            }
+        });
+
+        async function loadCloudData(email) {
+            try {
+                const snap = await getDoc(doc(dbCloud, "schools", email));
+                if(snap.exists()) {
+                    window.appData = snap.data();
+                } else {
+                    // Init default year if new
+                    const defaultYear = '2025-2026';
+                    window.appData.settings.activeYear = defaultYear;
+                    window.appData.years = {};
+                    window.appData.years[defaultYear] = { parents: [], transactions: [], grades: [{name:'صف 1', price:1500}] };
+                    await saveCloud();
+                }
+                
+                // Set Pointers
+                const y = window.appData.settings.activeYear;
+                if(!window.appData.years[y]) window.appData.years[y] = { parents: [], transactions: [], grades: [] };
+                currentYearData = window.appData.years[y];
+                
+                // UI Updates
+                document.getElementById('login-active-year').innerText = y;
+                document.getElementById('dash-year').innerText = y;
+                document.getElementById('splash-year-text').innerText = y;
+                renderPinUsers();
+            } catch(e) { console.error(e); alert("خطأ في التحميل"); }
+        }
+
+        window.saveCloud = async () => {
+            if(auth.currentUser) await setDoc(doc(dbCloud, "schools", auth.currentUser.email), window.appData);
+        };
+
+        window.fullLogout = () => signOut(auth).then(()=>location.reload());
+
+        // --- 2. PIN ---
+        function renderPinUsers() {
+            document.getElementById('login-users-container').innerHTML = window.appData.settings.users.map(u => `
+                <div onclick="selUser(${u.id}, '${u.name}')" class="bg-white/10 hover:bg-white/20 p-4 rounded-2xl cursor-pointer flex items-center gap-4 transition border border-white/5">
+                    <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-xl text-white">${u.name[0]}</div>
+                    <div class="text-white"><p class="font-bold">${u.name}</p><p class="text-xs opacity-70 uppercase">${u.role}</p></div>
+                </div>
+            `).join('');
+        }
+        let selLoginId = null;
+        window.selUser = (id, name) => { selLoginId = id; document.getElementById('pin-target-name').innerText = name; pinBuffer=""; updDots(); document.getElementById('pin-pad-area').classList.remove('opacity-50'); };
+        window.typePin = (n) => { if(pinBuffer.length<4) { pinBuffer+=n; updDots(); } };
+        window.clearPin = () => { pinBuffer=""; updDots(); };
+        function updDots() { for(let i=1; i<=4; i++) document.getElementById(`pd-${i}`).classList.toggle('active', i<=pinBuffer.length); }
+        window.submitPin = () => {
+            const u = window.appData.settings.users.find(x=>x.id===selLoginId);
+            if(u && u.pin===pinBuffer) {
+                currentUser = u;
+                document.getElementById('view-pin-login').classList.add('hidden');
+                document.getElementById('year-splash').classList.remove('hidden'); // Flash Year
+                setTimeout(() => {
+                    document.getElementById('year-splash').classList.add('hidden');
+                    document.getElementById('view-dashboard').classList.remove('hidden');
+                    initDash();
+                }, 3000);
+            } else { alert("خطأ"); clearPin(); }
+        };
+
+        // --- 3. UI & NAV ---
+        window.toggleFullScreen = () => {
+            if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else if(document.exitFullscreen) document.exitFullscreen();
+        };
+        window.userLogout = () => location.reload();
+        window.nav = (mod) => {
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-modules').classList.remove('hidden');
+            document.querySelectorAll('.module-view').forEach(m=>m.classList.add('hidden'));
+            document.getElementById('mod-'+mod).classList.remove('hidden');
+            
+            // Init Module Data
+            if(mod==='parents') initParents();
+            if(mod==='receipts') initReceipts();
+            if(mod==='reports') initReports();
+            if(mod==='others') initOthers();
+            if(mod==='settings') initSettings();
+        };
+        window.goHome = () => {
+            document.getElementById('view-modules').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.remove('hidden');
+        };
+
+        function initDash() {
+            document.getElementById('dash-school-name').innerText = window.appData.settings.schoolName;
+            document.getElementById('current-user-name').innerText = currentUser.name;
+            if(window.appData.settings.logo) {
+                document.getElementById('dash-logo').src = window.appData.settings.logo;
+                document.getElementById('dash-logo').classList.remove('hidden');
+            }
+            if(currentUser.role !== 'admin') document.getElementById('hub-settings-btn').style.display='none';
+        }
+
+        // --- 4. PARENTS ---
+        function initParents() {
+            renderParentsTable();
+            const sel = document.getElementById('s-grade');
+            sel.innerHTML = currentYearData.grades.map(g=>`<option value="${g.price}">${g.name}</option>`).join('');
+            tempStudents = [];
+            renderTemp();
+        }
+        window.addTempStudent = () => {
+            const n = document.getElementById('s-name').value;
+            const sel = document.getElementById('s-grade');
+            if(n) {
+                tempStudents.push({name:n, grade: sel.options[sel.selectedIndex].text, price: parseInt(sel.value)});
+                renderTemp();
+                document.getElementById('s-name').value="";
+            }
+        };
+        function renderTemp() {
+            let t = 0;
+            document.getElementById('temp-students-list').innerHTML = tempStudents.map(s => { t+=s.price; return `<div class="text-xs flex justify-between bg-white p-2 border rounded"><span>${s.name} (${s.grade})</span><span>${s.price}</span></div>`; }).join('');
+            document.getElementById('p-total').innerText = t.toLocaleString();
+        }
+        window.saveFamily = async () => {
+            const n = document.getElementById('p-name').value;
+            const p = document.getElementById('p-phone').value;
+            const t = parseInt(document.getElementById('p-total').innerText.replace(/,/g,''));
+            if(n && tempStudents.length>0) {
+                currentYearData.parents.push({id:Date.now(), name:n, phone:p, students:tempStudents, total:t, paid:0});
+                await window.saveCloud();
+                alert("تم الحفظ"); initParents();
+                document.getElementById('p-name').value=""; document.getElementById('p-phone').value="";
+            }
+        };
+        window.filterParents = (q) => renderParentsTable(q);
+        function renderParentsTable(q="") {
+            document.getElementById('parents-list').innerHTML = currentYearData.parents.slice().reverse().filter(p=>p.name.includes(q)).map(p=>`
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="p-3 font-bold">${p.name}</td>
+                    <td class="p-3 font-mono text-xs">${p.phone}</td>
+                    <td class="p-3 text-center">${p.students.length}</td>
+                    <td class="p-3 text-indigo-600">${p.total}</td>
+                    <td class="p-3"><button onclick="editParent(${p.id})" class="text-blue-500 hover:underline">تعديل</button></td>
+                </tr>
+            `).join('');
+        }
+        // Edit & Delete
+        window.editParent = (id) => {
+            editParentId = id;
+            const p = currentYearData.parents.find(x=>x.id===id);
+            document.getElementById('mod-p-name').value = p.name;
+            document.getElementById('mod-p-phone').value = p.phone;
+            document.getElementById('mod-students').innerHTML = p.students.map((s,i) => `
+                <div class="flex gap-2 text-sm"><input value="${s.name}" class="border rounded p-1 w-1/2" onchange="updSt(${id},${i},'name',this.value)"><input value="${s.price}" class="border rounded p-1 w-1/4" onchange="updSt(${id},${i},'price',this.value)"></div>
+            `).join('');
+            document.getElementById('modal-parent').classList.remove('hidden');
+            document.getElementById('modal-parent').classList.add('flex');
+        };
+        window.updSt = (pid, sid, f, v) => {
+            const p = currentYearData.parents.find(x=>x.id===pid);
+            p.students[sid][f] = (f==='price')?parseInt(v):v;
+            // Recalc total
+            p.total = p.students.reduce((a,b)=>a+b.price, 0);
+        };
+        window.saveParentEdit = async () => {
+            const p = currentYearData.parents.find(x=>x.id===editParentId);
+            p.name = document.getElementById('mod-p-name').value;
+            p.phone = document.getElementById('mod-p-phone').value;
+            await window.saveCloud();
+            closeModal(); renderParentsTable();
+        };
+        window.deleteParent = async () => {
+            if(confirm("حذف نهائي؟")) {
+                currentYearData.parents = currentYearData.parents.filter(x=>x.id!==editParentId);
+                await window.saveCloud();
+                closeModal(); renderParentsTable();
+            }
+        };
+        window.closeModal = () => { document.getElementById('modal-parent').classList.add('hidden'); document.getElementById('modal-parent').classList.remove('flex'); };
+
+        // --- 5. FINANCE (RECEIPTS + PAYMENTS) ---
+        let actRecParent = null;
+        function initReceipts() {
+            document.getElementById('rec-recent').innerHTML = currentYearData.transactions.filter(t=>t.type==='in').slice(-3).reverse().map(t=>`<li>${t.name} - ${t.amount}</li>`).join('');
+        }
+        window.searchParent = (q) => {
+            const r = document.getElementById('rec-results');
+            if(q.length<2) { r.classList.add('hidden'); return; }
+            r.innerHTML = currentYearData.parents.filter(p=>p.name.includes(q)).map(p=>`<div onclick="selRecP(${p.id})" class="p-3 border-b hover:bg-slate-50 cursor-pointer font-bold">${p.name}</div>`).join('');
+            r.classList.remove('hidden');
+        };
+        window.selRecP = (id) => {
+            actRecParent = currentYearData.parents.find(x=>x.id===id);
+            document.getElementById('rec-search').value = actRecParent.name;
+            document.getElementById('rec-results').classList.add('hidden');
+            document.getElementById('rec-info').classList.remove('hidden');
+            document.getElementById('rec-p-name').innerText = actRecParent.name;
+            document.getElementById('rec-p-debt').innerText = (actRecParent.total - actRecParent.paid).toLocaleString();
+        };
+        window.printReceipt = async () => {
+            if(!actRecParent) return alert("اختر ولي أمر");
+            const amt = parseFloat(document.getElementById('rec-amount').value);
+            if(!amt) return alert("المبلغ؟");
+            actRecParent.paid += amt;
+            const txn = {id:Date.now(), type:'in', name:actRecParent.name, amount:amt, date:new Date().toLocaleDateString('ar-LY'), by:currentUser.name, method:document.getElementById('rec-method').value};
+            currentYearData.transactions.push(txn);
+            await window.saveCloud();
+            printA5(txn, actRecParent.total - actRecParent.paid);
+        };
+        window.printPayment = async () => {
+            const to = document.getElementById('pay-to').value;
+            const amt = parseFloat(document.getElementById('pay-amount').value);
+            if(!to || !amt) return alert("بيانات؟");
+            const txn = {id:Date.now(), type:'out', name:to, amount:amt, date:new Date().toLocaleDateString('ar-LY'), by:currentUser.name, reason:document.getElementById('pay-reason').value};
+            currentYearData.transactions.push(txn);
+            await window.saveCloud();
+            printA5(txn, 0);
+        };
+
+        function printA5(txn, debt) {
+            const logo = window.appData.settings.logo ? `<img src="${window.appData.settings.logo}" style="height:60px;">` : '';
+            const title = txn.type === 'in' ? 'سند قبض' : 'سند صرف';
+            const color = txn.type === 'in' ? '#10b981' : '#f43f5e'; // Green/Red
+            
+            document.getElementById('print-area').innerHTML = `
+                <div style="border:2px solid ${color}; padding:20px; height:140mm; font-family:'Tajawal'">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid ${color}; padding-bottom:10px;">
+                        <div>${logo}</div>
+                        <div style="text-align:center"><h1 style="font-size:24px; font-weight:900;">${window.appData.settings.schoolName}</h1><p>${title}</p></div>
+                        <div style="text-align:left"><p>رقم: #${txn.id.toString().slice(-4)}</p><p>${txn.date}</p></div>
+                    </div>
+                    <div style="margin-top:30px; font-size:18px; line-height:2;">
+                        <p>${txn.type==='in'?'استلمنا من':'صرفنا لـ'}: <b>${txn.name}</b></p>
+                        <p>مبلغ: <b style="border:1px solid #000; padding:2px 10px;">${txn.amount} د.ل</b></p>
+                        <p>بيان: ${txn.reason || 'رسوم دراسية'} (${txn.method || 'نقداً'})</p>
+                        ${txn.type==='in' ? `<p style="margin-top:20px; font-size:14px; color:#666;">المتبقي على الحساب: ${debt}</p>` : ''}
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-top:50px; text-align:center;">
+                        <div><b>المحاسب</b><br>${txn.by}</div>
+                        <div><b>التوقيع/الختم</b><br>..............</div>
+                    </div>
+                </div>
+            `;
+            window.print();
+            setTimeout(()=>goHome(), 1000);
+        }
+
+        // --- 6. REPORTS & OTHERS ---
+        function initReports() {
+            // Stats
+            const tin = currentYearData.transactions.filter(t=>t.type==='in').reduce((a,b)=>a+b.amount,0);
+            const tout = currentYearData.transactions.filter(t=>t.type==='out').reduce((a,b)=>a+b.amount,0);
+            const tdebt = currentYearData.parents.reduce((a,b)=>a+(b.total-b.paid),0);
+            document.getElementById('rep-in').innerText = tin.toLocaleString();
+            document.getElementById('rep-out').innerText = tout.toLocaleString();
+            document.getElementById('rep-debt').innerText = tdebt.toLocaleString();
+            // Table
+            document.getElementById('rep-table').innerHTML = currentYearData.parents.map(p=>`
+                <tr class="border-b"><td class="p-2">${p.name}</td><td class="p-2">${p.phone}</td><td class="p-2 text-rose-500 font-bold">${p.total-p.paid}</td></tr>
+            `).join('');
+        }
+
+        function initOthers() {
+            // Records
+            document.getElementById('records-body').innerHTML = currentYearData.transactions.slice().reverse().map(t=>`
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="p-3 text-xs text-slate-400">#${t.id.toString().slice(-4)}</td>
+                    <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold text-white ${t.type==='in'?'bg-emerald-500':'bg-rose-500'}">${t.type==='in'?'قبض':'صرف'}</span></td>
+                    <td class="p-3 font-bold">${t.name} <span class="text-xs font-normal text-slate-500">(${t.reason||'رسوم'})</span></td>
+                    <td class="p-3 font-bold">${t.amount}</td>
+                    <td class="p-3 text-xs">${t.date}</td>
+                    <td class="p-3 text-xs">${t.by}</td>
+                </tr>
+            `).join('');
+            
+            // Daily Closing
+            const today = new Date().toLocaleDateString('ar-LY');
+            const todayTxns = currentYearData.transactions.filter(t => t.date === today);
+            const din = todayTxns.filter(t=>t.type==='in').reduce((a,b)=>a+b.amount,0);
+            const dout = todayTxns.filter(t=>t.type==='out').reduce((a,b)=>a+b.amount,0);
+            
+            document.getElementById('daily-in').innerText = din;
+            document.getElementById('daily-out').innerText = dout;
+            document.getElementById('daily-net').innerText = din - dout;
+        }
+
+        window.filterRecords = (q) => {
+            const rows = document.getElementById('records-body').rows;
+            for(let r of rows) r.style.display = r.innerText.includes(q) ? '' : 'none';
+        };
+
+        window.printDailyReport = () => {
+            const today = new Date().toLocaleDateString('ar-LY');
+            const din = document.getElementById('daily-in').innerText;
+            const dout = document.getElementById('daily-out').innerText;
+            const net = document.getElementById('daily-net').innerText;
+            
+            document.getElementById('print-area').innerHTML = `
+                <div style="border:2px solid #000; padding:30px; font-family:'Tajawal'; text-align:center;">
+                    <h1>تقرير الإغلاق اليومي</h1>
+                    <h3>التاريخ: ${today}</h3>
+                    <hr style="margin:20px 0;">
+                    <h2 style="margin:10px 0;">وارد: ${din}</h2>
+                    <h2 style="margin:10px 0;">صادر: ${dout}</h2>
+                    <h1 style="margin:20px 0; border:2px solid #000; padding:10px;">الصافي: ${net}</h1>
+                    <p style="margin-top:50px;">توقيع المسؤول: ______________</p>
+                </div>
+            `;
+            window.print();
+        };
+
+        // --- 7. SETTINGS & YEAR MGMT ---
+        function initSettings() {
+            document.getElementById('set-name').value = window.appData.settings.schoolName;
+            document.getElementById('new-year-input').value = window.appData.settings.activeYear;
+            renderSettingsLists();
+        }
+        function renderSettingsLists() {
+            document.getElementById('grades-list').innerHTML = currentYearData.grades.map(g=>`<li class="flex justify-between bg-slate-50 p-1 rounded border"><span>${g.name}</span><span>${g.price}</span></li>`).join('');
+            document.getElementById('users-list').innerHTML = window.appData.settings.users.map(u=>`<li class="flex justify-between bg-slate-50 p-1 rounded border"><span>${u.name} (${u.role})</span><span>${u.pin}</span></li>`).join('');
+        }
+        
+        window.saveSettings = async () => {
+            window.appData.settings.schoolName = document.getElementById('set-name').value;
+            await window.saveCloud();
+            alert("تم الحفظ");
+        };
+        window.uploadLogo = (input) => {
+            const r = new FileReader();
+            r.onload = async (e) => { window.appData.settings.logo = e.target.result; await window.saveCloud(); alert("شعار محدث"); };
+            r.readAsDataURL(input.files[0]);
+        };
+        
+        window.changeYear = async () => {
+            const y = document.getElementById('new-year-input').value;
+            if(y && y !== window.appData.settings.activeYear) {
+                if(confirm(`تغيير السنة إلى ${y}؟ ستفتح بيانات جديدة.`)) {
+                    window.appData.settings.activeYear = y;
+                    if(!window.appData.years[y]) window.appData.years[y] = { parents:[], transactions:[], grades: currentYearData.grades }; // Copy grades structure
+                    await window.saveCloud();
+                    location.reload();
+                }
+            }
+        };
+
+        window.promoteStudents = async () => {
+            const targetYear = prompt("ادخل اسم السنة القادمة للترحيل إليها (مثلاً 2026-2027):");
+            if(targetYear && window.appData.years[targetYear]) {
+                if(confirm("هل أنت متأكد؟ سيتم نقل الطلبة وتصفير ديونهم.")) {
+                    const nextYearData = window.appData.years[targetYear];
+                    currentYearData.parents.forEach(p => {
+                        // Create copy of parent for next year with 0 debt
+                        const newP = { ...p, id: Date.now() + Math.random(), paid: 0, total: 0 }; 
+                        // Logic to upgrade grade could be added here (e.g. Grade 1 -> Grade 2 text manipulation)
+                        nextYearData.parents.push(newP);
+                    });
+                    await window.saveCloud();
+                    alert("تم الترحيل!");
+                }
+            } else { alert("السنة الهدف غير موجودة، قم بإنشائها أولاً."); }
+        };
+
+        // Add User/Grade
+        window.addGrade = async () => { const n=document.getElementById('g-name').value, p=document.getElementById('g-price').value; if(n){ currentYearData.grades.push({name:n, price:parseInt(p)}); await window.saveCloud(); renderSettingsLists(); }};
+        window.addUser = async () => { const n=document.getElementById('u-name').value, p=document.getElementById('u-pin').value; if(n){ window.appData.settings.users.push({id:Date.now(), name:n, pin:p, role:'staff'}); await window.saveCloud(); renderSettingsLists(); }};
+
+        // Backup
+        window.exportJSON = () => {
+            const a = document.createElement('a');
+            a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.appData));
+            a.download = "backup.json"; a.click();
+        };
+        window.importJSON = (input) => {
+            const r = new FileReader();
+            r.onload = async (e) => {
+                window.appData = JSON.parse(e.target.result);
+                await window.saveCloud(); alert("تم الاسترداد"); location.reload();
+            };
+            r.readAsText(input.files[0]);
+        };
+
+    </script>
+</body>
+</html>
