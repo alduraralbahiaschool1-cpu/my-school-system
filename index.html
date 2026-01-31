@@ -1,1306 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المنظومة المالية المدرسية | الإصدار المتقدم v6</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        /* --- الأساسيات والخطوط --- */
-        :root { --font-main: 'Tajawal', sans-serif; --color-primary: #4f46e5; --color-sec: #64748b; }
-        body { font-family: var(--font-main); background-color: #f1f5f9; overflow-x: hidden; touch-action: manipulation; }
-        
-        /* --- تخصيص شريط التمرير --- */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* --- أدوات واجهة المستخدم --- */
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.6); }
-        .glass-dark { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); }
-        
-        .input-std { 
-            @apply w-full p-4 rounded-xl border border-slate-200 bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-bold text-slate-700 placeholder-slate-300; 
-        }
-        
-        .btn-main {
-            @apply bg-indigo-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2;
-        }
-
-        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-
-        /* --- تأثيرات الحركة (Animations) --- */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        
-        @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        .animate-pulse-soft { animation: pulse-soft 2s infinite; }
-
-        /* --- مكونات خاصة --- */
-        .pin-dot { width: 20px; height: 20px; border-radius: 50%; border: 3px solid #cbd5e1; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .pin-dot.active { background-color: #6366f1; border-color: #6366f1; transform: scale(1.2); box-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
-        .pin-dot.error { border-color: #f43f5e; animation: shake 0.3s; }
-        
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-
-        /* --- Modal Styles --- */
-        .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .modal-backdrop.open { opacity: 1; pointer-events: auto; }
-        .modal-content { background: white; border-radius: 2rem; max-width: 90%; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-        .modal-backdrop.open .modal-content { transform: scale(1); }
-
-        /* --- Badge Styles --- */
-        .badge { @apply px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider; }
-        .badge-success { @apply bg-emerald-100 text-emerald-700; }
-        .badge-danger { @apply bg-rose-100 text-rose-700; }
-        .badge-warning { @apply bg-amber-100 text-amber-700; }
-        .badge-info { @apply bg-blue-100 text-blue-700; }
-
-        /* --- الطباعة (Printing - Strict A5 & A4 Support) --- */
-        @media print {
-            body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            body * { visibility: hidden; }
-            #print-area, #print-area * { visibility: visible; }
-            #print-area { position: absolute; left: 0; top: 0; width: 100%; min-height: 100%; background: white; padding: 0; margin: 0; }
-            
-            .no-print { display: none !important; }
-            
-            /* جداول التقارير في الطباعة */
-            .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-            .print-table th, .print-table td { border: 1px solid #333; padding: 8px; text-align: right; }
-            .print-table th { background-color: #f3f4f6 !important; font-weight: bold; }
-            
-            /* رؤوس الصفحات */
-            .print-header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-            .print-footer { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 10px; border-top: 1px solid #ccc; padding-top: 5px; }
-
-            @page { margin: 10mm; }
-        }
-    </style>
-</head>
-<body class="text-slate-800 h-screen flex flex-col">
-
-    <div id="view-google-login" class="fixed inset-0 z-[60] bg-slate-900 flex flex-col items-center justify-center p-6 text-center">
-        <div class="bg-white p-12 rounded-[3rem] shadow-2xl max-w-md w-full fade-in relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-            
-            <div class="w-24 h-24 bg-indigo-50 rounded-[2rem] flex items-center justify-center text-5xl mb-8 mx-auto text-indigo-600 shadow-inner ring-4 ring-indigo-50">☁️</div>
-            
-            <h1 class="text-4xl font-black text-slate-900 mb-3 tracking-tight">المنظومة المالية</h1>
-            <h2 class="text-lg font-bold text-indigo-500 mb-6">الإصدار المدرسي المتكامل</h2>
-            <p class="text-slate-500 mb-10 font-medium leading-relaxed">يرجى ربط حساب المدرسة (Google Account) للمزامنة السحابية والحماية من فقدان البيانات.</p>
-            
-            <button onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-4 bg-white border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 text-slate-700 font-bold py-5 px-6 rounded-2xl transition-all shadow-sm hover:shadow-md group active:scale-95">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6 group-hover:scale-110 transition">
-                <span class="text-lg">اتصال بحساب المدرسة</span>
-            </button>
-            
-            <div id="login-status" class="mt-8 flex items-center justify-center gap-2 text-indigo-600 hidden">
-                <span class="w-2 h-2 bg-indigo-600 rounded-full animate-ping"></span>
-                <span class="text-sm font-black">جاري الاتصال بقاعدة البيانات الآمنة...</span>
-            </div>
-            
-            <p class="mt-8 text-xs text-slate-400">جميع الحقوق محفوظة © 2026 | نظام مبرمج</p>
-        </div>
-    </div>
-
-    <div id="view-pin-login" class="hidden fixed inset-0 z-50 bg-slate-900 flex items-center justify-center p-6 bg-[url('https://img.freepik.com/free-vector/white-abstract-background-design_23-2148825582.jpg?w=1380&t=st=1706680000~exp=1706680600~hmac=...')] bg-cover bg-center">
-        <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-sm"></div>
-        
-        <div class="relative w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-16 items-center z-10">
-            
-            <div class="space-y-10 text-white">
-                <div>
-                    <div class="flex items-center gap-3 mb-6">
-                        <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-xs font-mono border border-emerald-500/30 flex items-center gap-2">
-                            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-                            <span id="cloud-email-display">...</span>
-                        </span>
-                        <button onclick="fullLogout()" class="text-xs text-rose-300 hover:text-rose-100 underline decoration-rose-500/30">فصل الحساب</button>
-                    </div>
-                    
-                    <h1 class="text-7xl font-black mb-2 tracking-tighter" id="school-name-display">المدرسة<br><span class="text-indigo-400">النموذجية</span></h1>
-                    <p class="text-slate-400 text-2xl font-light">نظام الإدارة المالية المتطور</p>
-                </div>
-
-                <div class="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl">
-                    <label class="text-xs font-bold text-indigo-300 uppercase mb-3 block tracking-wider">العام الدراسي النشط</label>
-                    <div class="relative">
-                        <select id="login-year-select" class="w-full bg-slate-800/50 border border-white/10 text-white text-xl font-bold p-4 rounded-2xl outline-none focus:border-indigo-500 appearance-none cursor-pointer">
-                            </select>
-                        <i class="fa-solid fa-calendar-days absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    </div>
-                    <p class="text-[10px] text-slate-500 mt-2">* تغيير العام سيقوم بتحميل قاعدة بيانات منفصلة تماماً.</p>
-                </div>
-                
-                <div>
-                    <h3 class="font-bold mb-4 text-slate-300 flex items-center gap-2 text-sm uppercase tracking-widest"><i class="fa-solid fa-users"></i> المصرح لهم بالدخول:</h3>
-                    <div id="login-users-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto custom-scroll pr-2">
-                        </div>
-                </div>
-            </div>
-            
-            <div id="pin-pad-area" class="bg-white/5 backdrop-blur-xl border border-white/10 p-10 rounded-[3rem] shadow-2xl opacity-50 pointer-events-none transition-all duration-300 transform scale-95">
-                <div class="text-center mb-8">
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">تسجيل دخول المستخدم</p>
-                    <p id="pin-target-name" class="text-white font-black mb-8 text-3xl h-10">اختر مستخدماً</p>
-                    <div class="flex justify-center gap-6 dir-ltr mb-4">
-                        <div class="pin-dot" id="pd-1"></div>
-                        <div class="pin-dot" id="pd-2"></div>
-                        <div class="pin-dot" id="pd-3"></div>
-                        <div class="pin-dot" id="pd-4"></div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-4">
-                    <button onclick="typePin('1')" class="h-20 rounded-2xl bg-white/5 hover:bg-white/20 text-white text-2xl font-bold transition border border-white/5 active:scale-95">1</button>
-                    <button onclick="typePin('2')" class="h-20 rounded-2xl bg-white/5 hover:bg-white/20 text-white text-2xl font-bold transition border border-white/5 active:scale-95">2</button>
-                    <button onclick="typePin('3')" class="h-20 rounded-2xl bg-white/5 hover:bg-white/20 text-white text-2xl font-bold transition border border-white/5 active:scale-95">3</button>
-                    <button onclick="typePin('4')" class="h-20 rounded-2xl bg-white/5 hover:bg-white/20 text-white text-2xl font-bold transition border border-white/5 active:scale-95">4</button>
-                    <button onclick="typePin('5')" class="h-20 rounded-2xl bg-white/5 hover:bg-white/20 text-white text-2xl font-bold transition border border-white/5 active:scale-95">5</button>
-                    <button onclick="typePin('6')" class="h-20 rounded-2xl bg-white/5 hover:bg-white/20 text-white text-2xl font-bold transition border border-white/5 active:scale-95">6</button>
-                    <button onclick="typePin('7')" class="h-20 rounded-2xl bg-white/5 hover:bg-white/20 text-white text-2xl font-bold transition border border-white/5 active:scale-95">7</button>
-                    <button onclick="typePin('8')" class="h-20 rounded-2xl bg-white/5 hover:bg-white/20 text-white text-2xl font-bold transition border border-white/5 active:scale-95">8</button>
-                    <button onclick="typePin('9')" class="h-20 rounded-2xl bg-white/5 hover:bg-white/20 text-white text-2xl font-bold transition border border-white/5 active:scale-95">9</button>
-                    <button onclick="clearPin()" class="h-20 rounded-2xl bg-rose-500/20 text-rose-400 text-xl font-bold hover:bg-rose-500/40 transition border border-white/5 active:scale-95"><i class="fa-solid fa-delete-left"></i></button>
-                    <button onclick="typePin('0')" class="h-20 rounded-2xl bg-white/5 hover:bg-white/20 text-white text-2xl font-bold transition border border-white/5 active:scale-95">0</button>
-                    <button onclick="submitPin()" class="h-20 rounded-2xl bg-indigo-600 text-white text-xl font-bold hover:bg-indigo-500 transition shadow-lg shadow-indigo-900/50 active:scale-95"><i class="fa-solid fa-arrow-left"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="view-dashboard" class="hidden min-h-screen flex flex-col p-4 md:p-8 relative max-w-[1600px] mx-auto w-full">
-        
-        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
-            <div class="flex items-center gap-6 w-full md:w-auto">
-                <div class="w-20 h-20 bg-slate-50 rounded-2xl border flex items-center justify-center overflow-hidden shadow-inner relative group">
-                    <img id="dash-logo" src="" alt="Logo" class="w-full h-full object-contain p-2 hidden">
-                    <span id="dash-logo-placeholder" class="text-4xl text-slate-300">🏫</span>
-                    <label for="quick-logo-upload" class="absolute inset-0 bg-black/50 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 cursor-pointer transition text-xs text-center">تغيير<br>الشعار</label>
-                    <input type="file" id="quick-logo-upload" class="hidden" onchange="handleLogoUpload(this, true)">
-                </div>
-                <div>
-                    <h1 id="dash-school-title" class="text-2xl font-black text-slate-800 mb-1">...</h1>
-                    <div class="flex items-center gap-3">
-                        <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold border border-indigo-200" id="dash-year-display">2025-2026</span>
-                        <span class="flex items-center gap-1.5 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold border border-emerald-200">
-                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                            <span>متصل</span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-4 w-full md:w-auto justify-end">
-                <div class="bg-slate-50 px-5 py-3 rounded-2xl border border-slate-100 text-left">
-                    <p id="current-user-name" class="font-bold text-slate-800">...</p>
-                    <p id="current-user-role" class="text-[10px] text-indigo-500 font-black uppercase tracking-wider">...</p>
-                </div>
-                <button onclick="userLogout()" class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition shadow-sm border border-rose-100 text-xl" title="تسجيل خروج">
-                    <i class="fa-solid fa-power-off"></i>
-                </button>
-            </div>
-        </header>
-
-        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-10">
-            <div onclick="nav('receipts')" class="dash-card card-hover bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden h-64 flex flex-col justify-between shadow-lg shadow-emerald-200">
-                <div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-inner"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-                <div class="relative z-10">
-                    <h2 class="text-2xl font-black mb-1">سند قبض</h2>
-                    <p class="opacity-80 text-sm font-medium">رسوم تسجيل، أقساط، كتب</p>
-                </div>
-                <div class="flex justify-between items-end relative z-10">
-                    <span class="text-xs bg-black/10 px-3 py-1 rounded-lg backdrop-blur-sm">شائع الاستخدام</span>
-                    <i class="fa-solid fa-arrow-left text-xl opacity-60 group-hover:opacity-100 group-hover:-translate-x-2 transition"></i>
-                </div>
-            </div>
-
-            <div onclick="nav('payments')" class="dash-card card-hover bg-gradient-to-br from-rose-500 to-pink-600 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden h-64 flex flex-col justify-between shadow-lg shadow-rose-200">
-                <div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-inner"><i class="fa-solid fa-money-bill-transfer"></i></div>
-                <div class="relative z-10">
-                    <h2 class="text-2xl font-black mb-1">سند دفع</h2>
-                    <p class="opacity-80 text-sm font-medium">مصروفات تشغيلية، رواتب، صيانة</p>
-                </div>
-                <i class="fa-solid fa-arrow-left text-xl absolute bottom-8 left-8"></i>
-            </div>
-
-            <div onclick="nav('parents')" class="dash-card card-hover bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden h-64 flex flex-col justify-between shadow-lg shadow-indigo-200">
-                <div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-inner"><i class="fa-solid fa-users"></i></div>
-                <div class="relative z-10">
-                    <h2 class="text-2xl font-black mb-1">أولياء الأمور</h2>
-                    <p class="opacity-80 text-sm font-medium">إدارة العائلات، التعديل، كشف الحساب</p>
-                </div>
-                <i class="fa-solid fa-arrow-left text-xl absolute bottom-8 left-8"></i>
-            </div>
-
-            <div onclick="nav('reports')" class="dash-card card-hover bg-gradient-to-br from-amber-400 to-orange-500 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden h-64 flex flex-col justify-between shadow-lg shadow-amber-200">
-                <div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-inner"><i class="fa-solid fa-chart-pie"></i></div>
-                <div class="relative z-10">
-                    <h2 class="text-2xl font-black mb-1">التقارير</h2>
-                    <p class="opacity-80 text-sm font-medium">الخزينة، الديون، الإحصائيات</p>
-                </div>
-                <i class="fa-solid fa-arrow-left text-xl absolute bottom-8 left-8"></i>
-            </div>
-
-            <div onclick="nav('others')" class="dash-card card-hover bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden h-64 flex flex-col justify-between shadow-lg shadow-cyan-200 lg:col-span-2">
-                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                <div class="flex items-start justify-between relative z-10">
-                    <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-folder-open"></i></div>
-                    <span class="bg-white/20 px-3 py-1 rounded-lg text-xs font-bold">جديد</span>
-                </div>
-                <div class="relative z-10">
-                    <h2 class="text-2xl font-black mb-1">أخرى / السجلات</h2>
-                    <p class="opacity-80 text-sm font-medium">أرشيف الفواتير، البحث المتقدم، الإقفال اليومي</p>
-                </div>
-                <div class="flex gap-2 relative z-10 mt-4">
-                    <span class="text-xs bg-black/20 px-2 py-1 rounded">إقفال الصندوق</span>
-                    <span class="text-xs bg-black/20 px-2 py-1 rounded">سجل الحركات</span>
-                </div>
-            </div>
-
-            <div id="hub-settings-btn" onclick="nav('settings')" class="dash-card card-hover bg-slate-800 text-white p-8 rounded-[2.5rem] cursor-pointer relative overflow-hidden h-64 flex flex-col justify-between shadow-lg shadow-slate-400 lg:col-span-2">
-                <div class="absolute right-0 top-0 w-64 h-full bg-gradient-to-l from-slate-700 to-transparent opacity-50"></div>
-                <div class="flex justify-between items-start relative z-10">
-                    <div class="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-inner border border-white/5"><i class="fa-solid fa-gears"></i></div>
-                    <span class="bg-indigo-500 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-indigo-400">Admin Only</span>
-                </div>
-                <div class="relative z-10">
-                    <h2 class="text-2xl font-black mb-1">الضبط والمزامنة</h2>
-                    <p class="opacity-60 text-sm font-medium">إدارة السنوات، الترحيل، المستخدمين، النسخ الاحتياطي</p>
-                </div>
-                <i class="fa-solid fa-arrow-left text-xl absolute bottom-8 left-8"></i>
-            </div>
-        </div>
-    </div>
-<div id="view-modules" class="hidden min-h-screen flex flex-col bg-slate-100">
-        <div class="bg-white/80 backdrop-blur-md px-6 py-4 shadow-sm border-b border-slate-200 flex justify-between items-center sticky top-0 z-40 no-print transition-all">
-            <div class="flex items-center gap-4">
-                <button onclick="goHome()" class="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-500 transition"><i class="fa-solid fa-arrow-right text-xl"></i></button>
-                <h2 id="module-title" class="text-2xl font-black text-slate-800">...</h2>
-            </div>
-            <div class="flex gap-3">
-                <div class="hidden md:flex flex-col items-end mr-4">
-                    <span class="text-xs font-bold text-slate-400 uppercase">السنة المالية</span>
-                    <span class="text-sm font-black text-indigo-600" id="mod-header-year">...</span>
-                </div>
-                <button onclick="goHome()" class="flex items-center gap-2 bg-slate-800 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-slate-900 transition shadow-lg shadow-slate-300 text-sm">
-                    <span>الرئيسية</span> <i class="fa-solid fa-house"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="flex-1 p-4 md:p-8 max-w-[1600px] mx-auto w-full overflow-y-auto custom-scroll">
-
-            <div id="mod-parents" class="module-view hidden space-y-8 fade-in">
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="bg-gradient-to-r from-indigo-600 to-indigo-500 p-6 text-white flex justify-between items-center">
-                        <h3 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-user-plus"></i> تسجيل عائلة جديدة</h3>
-                        <span class="text-xs bg-white/20 px-3 py-1 rounded-lg border border-white/20">حفظ تلقائي للسحابة</span>
-                    </div>
-                    <div class="p-8">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            <div><label class="text-xs font-bold text-slate-400 mb-1 block">ولي الأمر (الاسم الرباعي)</label><input type="text" id="parent-name" class="input-std" placeholder="مثال: محمد أحمد علي"></div>
-                            <div><label class="text-xs font-bold text-slate-400 mb-1 block">رقم الهاتف</label><input type="tel" id="parent-phone" class="input-std font-mono" placeholder="09XXXXXXXX"></div>
-                        </div>
-                        
-                        <div class="bg-slate-50 rounded-3xl p-6 border border-slate-200 mb-6 relative group focus-within:ring-2 ring-indigo-100 transition">
-                            <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-graduation-cap"></i> بيانات الأبناء</h4>
-                            <div class="flex flex-col lg:flex-row gap-3 mb-4">
-                                <input type="text" id="new-student-name" placeholder="اسم الطالب" class="flex-[2] p-3 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 transition">
-                                <input type="text" id="new-student-mother" placeholder="اسم الأم (اختياري)" class="flex-[1] p-3 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 bg-white">
-                                <select id="new-student-grade" class="flex-1 p-3 rounded-xl border border-slate-200 outline-none font-bold text-sm bg-white cursor-pointer focus:border-indigo-500"></select>
-                                <button onclick="addTempStudent()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">+</button>
-                            </div>
-                            <div id="temp-students-list" class="space-y-2"></div>
-                            <p class="text-[10px] text-slate-400 mt-2 text-left">* اضغط + لإدراج الطالب في القائمة قبل الحفظ النهائي.</p>
-                        </div>
-                        
-                        <div class="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-slate-100">
-                            <div>
-                                <p class="text-xs text-slate-400 font-bold uppercase">إجمالي الرسوم المقدرة</p>
-                                <p id="parent-total-calc" class="text-4xl font-black text-indigo-600">0 <span class="text-sm text-slate-400 font-medium">د.ل</span></p>
-                            </div>
-                            <button onclick="saveFamily()" class="btn-main w-full md:w-auto py-4 px-10 text-lg"><span>حفظ العائلة ومزامنة</span> <i class="fa-solid fa-cloud-arrow-up"></i></button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-8 min-h-[500px]">
-                    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                        <h3 class="font-bold text-slate-800 text-xl flex items-center gap-2"><i class="fa-solid fa-database text-slate-400"></i> قاعدة البيانات <span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500" id="parents-count-badge">0</span></h3>
-                        <div class="relative w-full md:w-96">
-                            <input type="text" oninput="filterParentsTable(this.value)" placeholder="بحث باسم ولي الأمر، الطالب، أو رقم الهاتف..." class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white transition shadow-sm">
-                            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto custom-scroll rounded-xl border border-slate-100">
-                        <table class="w-full text-right bg-white">
-                            <thead class="bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-wider">
-                                <tr>
-                                    <th class="p-5">#</th>
-                                    <th class="p-5">ولي الأمر</th>
-                                    <th class="p-5">الهاتف</th>
-                                    <th class="p-5 text-center">عدد الأبناء</th>
-                                    <th class="p-5">إجمالي الرسوم</th>
-                                    <th class="p-5">المدفوع</th>
-                                    <th class="p-5 text-rose-600">المتبقي</th>
-                                    <th class="p-5 text-center">الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="parents-list-body" class="divide-y divide-slate-50 text-sm font-bold text-slate-700"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="modal-edit-parent" class="modal-backdrop">
-                <div class="modal-content w-full max-w-4xl p-0">
-                    <div class="bg-indigo-600 p-6 text-white flex justify-between items-center sticky top-0 z-10">
-                        <h3 class="text-xl font-bold">تعديل بيانات / كشف حساب</h3>
-                        <button onclick="closeModal('modal-edit-parent')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition"><i class="fa-solid fa-times"></i></button>
-                    </div>
-                    <div class="p-8 bg-slate-50">
-                        <input type="hidden" id="edit-p-id">
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                            <div><label class="text-xs text-slate-400 font-bold">ولي الأمر</label><input type="text" id="edit-p-name" class="input-std py-2"></div>
-                            <div><label class="text-xs text-slate-400 font-bold">الهاتف</label><input type="text" id="edit-p-phone" class="input-std py-2 font-mono"></div>
-                        </div>
-
-                        <div class="mb-6">
-                            <h4 class="font-bold text-slate-700 mb-2 text-sm">الأبناء المسجلين</h4>
-                            <div id="edit-students-list" class="space-y-2"></div>
-                            <div class="mt-3 flex gap-2">
-                                <input type="text" id="edit-add-stu-name" placeholder="اسم طالب إضافي" class="p-2 rounded-lg border text-sm flex-1">
-                                <select id="edit-add-stu-grade" class="p-2 rounded-lg border text-sm"></select>
-                                <button onclick="addStudentToExistingParent()" class="bg-emerald-500 text-white px-4 rounded-lg text-xs font-bold">إضافة</button>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 mb-6 max-h-48 overflow-y-auto custom-scroll">
-                            <h4 class="font-bold text-slate-700 mb-3 text-sm flex justify-between">
-                                <span><i class="fa-solid fa-list"></i> سجل العمليات</span>
-                                <span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500">للعرض فقط</span>
-                            </h4>
-                            <table class="w-full text-xs text-right">
-                                <thead class="bg-slate-50 text-slate-500"><tr><th class="p-2">التاريخ</th><th class="p-2">النوع</th><th class="p-2">القيمة</th><th class="p-2">البيان</th></tr></thead>
-                                <tbody id="edit-history-body" class="divide-y"></tbody>
-                            </table>
-                        </div>
-
-                        <div class="flex justify-between items-center pt-4 border-t border-slate-200">
-                            <button onclick="deleteParent()" class="text-rose-500 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-xl text-sm font-bold transition border border-rose-200 flex items-center gap-2"><i class="fa-solid fa-trash"></i> حذف العائلة نهائياً</button>
-                            <button onclick="updateParentData()" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition">حفظ التغييرات</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mod-receipts" class="module-view hidden fade-in">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 no-print">
-                    <div class="bg-white rounded-[2.5rem] shadow-xl border border-emerald-100 p-8 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                        <h3 class="text-2xl font-black text-emerald-600 mb-8 flex items-center gap-2 relative z-10"><i class="fa-solid fa-file-invoice"></i> سند قبض جديد</h3>
-                        
-                        <div class="relative mb-8 z-10">
-                            <label class="text-xs font-bold text-slate-400 mb-1 block">ابحث عن ولي الأمر</label>
-                            <div class="relative">
-                                <input type="text" id="rec-search" oninput="searchParent(this.value)" class="w-full p-4 pl-10 bg-slate-50 border-2 border-transparent focus:border-emerald-500 rounded-2xl outline-none font-bold text-lg transition-all shadow-sm focus:bg-white" placeholder="الاسم أو الهاتف...">
-                                <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            </div>
-                            <div id="rec-results" class="absolute w-full bg-white shadow-2xl rounded-2xl mt-2 max-h-60 overflow-y-auto z-20 hidden border border-slate-100 custom-scroll"></div>
-                        </div>
-
-                        <div id="rec-info-card" class="hidden bg-emerald-50 rounded-2xl p-6 border border-emerald-100 mb-8 animate-in zoom-in duration-300 relative">
-                            <button onclick="clearRecSelection()" class="absolute top-2 left-2 text-slate-400 hover:text-rose-500"><i class="fa-solid fa-times-circle"></i></button>
-                            <div class="flex justify-between items-start mb-4">
-                                <div><h4 id="rec-p-name" class="font-black text-lg text-emerald-900">---</h4><p class="text-xs text-emerald-600 font-bold">ملف: <span id="rec-p-id">---</span></p></div>
-                                <div class="bg-white p-3 rounded-xl shadow-sm text-center border border-emerald-100 min-w-[100px]"><p class="text-[10px] text-slate-400 font-bold uppercase">الدين المتبقي</p><p id="rec-p-debt" class="text-xl font-black text-rose-500">0</p></div>
-                            </div>
-                            <div class="text-xs text-slate-500 bg-white/60 p-3 rounded-xl border border-white/50" id="rec-students-preview"></div>
-                        </div>
-
-                        <div class="space-y-6 relative z-10">
-                            <div><label class="text-xs font-bold text-slate-400 mb-1 block">المبلغ المستلم (د.ل)</label><input type="number" id="rec-amount" class="input-std text-3xl font-black text-emerald-600 h-20 shadow-inner text-center placeholder-emerald-100/50" placeholder="0.00"></div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div><label class="text-xs font-bold text-slate-400 mb-1 block">طريقة الدفع</label><select id="rec-method" onchange="toggleBankInfo()" class="input-std h-14 bg-white cursor-pointer"><option value="نقداً">نقداً 💵</option><option value="صك">صك 📄</option><option value="تحويل">تحويل 📲</option><option value="بطاقة">بطاقة 💳</option></select></div>
-                                <div id="bank-field" class="hidden"><label class="text-xs font-bold text-slate-400 mb-1 block">تفاصيل المرجع / الصك</label><input type="text" id="rec-ref" class="input-std h-14" placeholder="رقم الصك/الإيصال..."></div>
-                            </div>
-                            <div><label class="text-xs font-bold text-slate-400 mb-1 block">ملاحظات (اختياري)</label><input type="text" id="rec-note" class="input-std h-12 text-sm" placeholder="..."></div>
-                            <button onclick="printReceipt()" class="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black text-xl hover:bg-emerald-700 shadow-xl shadow-emerald-200 transition active:scale-95 flex items-center justify-center gap-3"><i class="fa-solid fa-print"></i> إصدار وطباعة الإيصال</button>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-8 h-fit">
-                        <h3 class="font-bold text-slate-700 mb-6 flex justify-between items-center">
-                            <span>آخر العمليات</span>
-                            <span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500 font-normal">اليوم</span>
-                        </h3>
-                        <ul id="recent-receipts-list" class="space-y-3"></ul>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mod-payments" class="module-view hidden fade-in">
-                <div class="max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-xl border border-rose-100 p-10 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-rose-500 to-orange-500"></div>
-                    <h3 class="text-3xl font-black text-rose-600 mb-10 flex items-center gap-3"><i class="fa-solid fa-money-bill-wave"></i> إصدار سند صرف</h3>
-                    <div class="space-y-8">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div><label class="text-xs font-bold text-slate-400 mb-1 block">يصرف للسيد / الجهة</label><input type="text" id="pay-to" placeholder="اسم المستفيد" class="input-std font-bold text-lg border-rose-100 focus:border-rose-500 focus:ring-rose-100"></div>
-                            <div><label class="text-xs font-bold text-slate-400 mb-1 block">تصنيف المصروف</label><select id="pay-cat" class="input-std bg-slate-50 cursor-pointer border-rose-100"><option>رواتب موظفين</option><option>صيانة مباني</option><option>قرطاسية ومطبوعات</option><option>نثريات وضيافة</option><option>مشتريات أصول</option><option>استرجاع رسوم</option><option>أخرى</option></select></div>
-                        </div>
-                        <div><label class="text-xs font-bold text-slate-400 mb-1 block">القيمة المصروفة (د.ل)</label><input type="number" id="pay-amount" class="input-std text-4xl font-black text-rose-500 h-20 shadow-inner" placeholder="0.00"></div>
-                        <div><label class="text-xs font-bold text-slate-400 mb-1 block">البيان (التفاصيل)</label><textarea id="pay-reason" placeholder="مقابل..." class="input-std h-24 pt-4 resize-none"></textarea></div>
-                        <button onclick="printPayment()" class="w-full bg-rose-500 text-white py-5 rounded-2xl font-black text-xl hover:bg-rose-600 shadow-xl shadow-rose-200 transition active:scale-95 flex items-center justify-center gap-3"><i class="fa-solid fa-print"></i> حفظ وطباعة السند</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mod-reports" class="module-view hidden fade-in">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 no-print">
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex justify-between items-center card-hover">
-                        <div><p class="text-xs font-bold uppercase text-emerald-500 mb-1">إجمالي المقبوضات</p><h2 id="rep-total-in" class="text-3xl font-black text-emerald-600">0</h2><p class="text-[10px] text-slate-400 mt-1">للسنة المالية الحالية</p></div>
-                        <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 text-xl"><i class="fa-solid fa-arrow-down"></i></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex justify-between items-center card-hover">
-                        <div><p class="text-xs font-bold uppercase text-rose-500 mb-1">إجمالي المصروفات</p><h2 id="rep-total-out" class="text-3xl font-black text-rose-600">0</h2><p class="text-[10px] text-slate-400 mt-1">للسنة المالية الحالية</p></div>
-                        <div class="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 text-xl"><i class="fa-solid fa-arrow-up"></i></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex justify-between items-center card-hover">
-                        <div><p class="text-xs font-bold uppercase text-slate-500 mb-1">الديون المستحقة</p><h2 id="rep-total-debt" class="text-3xl font-black text-slate-800">0</h2><p class="text-[10px] text-slate-400 mt-1">مبالغ لم يتم تحصيلها</p></div>
-                        <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 text-xl"><i class="fa-solid fa-circle-exclamation"></i></div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8">
-                    <div class="flex justify-between items-center mb-6 no-print">
-                        <h3 class="font-bold text-lg text-slate-800">تقرير الديون والمستحقات</h3>
-                        <button onclick="window.print()" class="bg-slate-800 text-white px-5 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-900 transition"><i class="fa-solid fa-print"></i> طباعة التقرير</button>
-                    </div>
-                    
-                    <div class="hidden" id="print-header-report">
-                        <div class="print-header">
-                             <h1 style="font-size: 20px; font-weight: bold;">تقرير مالي - الديون والمستحقات</h1>
-                             <p id="print-date-rep"></p>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right print-table">
-                            <thead class="bg-slate-100 text-slate-600 font-bold text-sm">
-                                <tr>
-                                    <th class="p-3 rounded-r-xl">ولي الأمر</th>
-                                    <th class="p-3">الهاتف</th>
-                                    <th class="p-3">إجمالي الرسوم</th>
-                                    <th class="p-3">المدفوع</th>
-                                    <th class="p-3 text-rose-600 rounded-l-xl">المتبقي (الدين)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="report-debt-body" class="divide-y text-sm font-bold"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mod-others" class="module-view hidden fade-in space-y-8">
-                
-                <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-200">
-                    <h3 class="font-black text-xl mb-6 text-slate-800 flex items-center gap-2"><i class="fa-solid fa-cash-register text-indigo-500"></i> الإقفال اليومي للصندوق</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 bg-slate-50 p-6 rounded-3xl border border-slate-100 mb-6">
-                        <div class="text-center border-l border-slate-200 pl-4">
-                            <p class="text-xs text-slate-400 font-bold uppercase mb-2">تاريخ اليوم</p>
-                            <p class="font-bold text-lg font-mono" id="daily-date">...</p>
-                        </div>
-                        <div class="text-center border-l border-slate-200 pl-4">
-                            <p class="text-xs text-emerald-500 font-bold uppercase mb-2">وارد اليوم (+)</p>
-                            <p class="font-black text-2xl text-emerald-600" id="daily-in">0</p>
-                        </div>
-                        <div class="text-center border-l border-slate-200 pl-4">
-                            <p class="text-xs text-rose-500 font-bold uppercase mb-2">صادر اليوم (-)</p>
-                            <p class="font-black text-2xl text-rose-600" id="daily-out">0</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-xs text-slate-800 font-bold uppercase mb-2">الصافي في الدرج</p>
-                            <p class="font-black text-3xl text-indigo-900 bg-white shadow-sm py-2 px-4 rounded-xl inline-block border border-indigo-100" id="daily-net">0</p>
-                        </div>
-                    </div>
-                    <div class="flex justify-end">
-                        <button onclick="printDailyReport()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition flex items-center gap-2 shadow-lg shadow-indigo-200"><i class="fa-solid fa-print"></i> طباعة تقرير الإقفال</button>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-200">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-list-check text-cyan-500"></i> سجل العمليات الكامل</h3>
-                        <input type="text" oninput="filterRecords(this.value)" placeholder="بحث برقم السند أو الاسم..." class="p-3 border rounded-xl w-64 text-sm outline-none focus:border-cyan-500 bg-slate-50">
-                    </div>
-                    <div class="overflow-y-auto max-h-[500px] custom-scroll">
-                        <table class="w-full text-right text-sm">
-                            <thead class="bg-slate-100 sticky top-0 z-10 text-slate-600">
-                                <tr>
-                                    <th class="p-3">#ID</th>
-                                    <th class="p-3">التاريخ</th>
-                                    <th class="p-3">النوع</th>
-                                    <th class="p-3">الاسم / الجهة</th>
-                                    <th class="p-3">المبلغ</th>
-                                    <th class="p-3">الطريقة</th>
-                                    <th class="p-3">بواسطة</th>
-                                </tr>
-                            </thead>
-                            <tbody id="records-table-body" class="divide-y font-bold text-slate-700 bg-white"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mod-settings" class="module-view hidden fade-in">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-indigo-100 relative overflow-hidden lg:col-span-2">
-                         <div class="absolute top-0 left-0 w-2 h-full bg-indigo-500"></div>
-                         <h3 class="font-black text-xl mb-6 text-indigo-900 flex items-center gap-2"><i class="fa-solid fa-calendar-check"></i> إدارة السنوات المالية والترحيل</h3>
-                         
-                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                             <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                                 <h4 class="font-bold text-sm mb-4">إنشاء عام دراسي جديد</h4>
-                                 <div class="flex gap-2">
-                                     <input type="text" id="new-year-input" placeholder="مثال: 2026-2027" class="input-std py-2 text-sm text-center font-mono">
-                                     <button onclick="createNewYear()" class="bg-indigo-600 text-white px-4 rounded-xl hover:bg-indigo-700 transition"><i class="fa-solid fa-plus"></i></button>
-                                 </div>
-                                 <p class="text-[10px] text-slate-400 mt-2 leading-relaxed">عند إنشاء عام جديد، ستبدأ قاعدة بيانات فارغة لهذا العام ويمكنك التبديل إليها.</p>
-                             </div>
-
-                             <div class="bg-amber-50 p-6 rounded-2xl border border-amber-100 md:col-span-2">
-                                 <h4 class="font-bold text-amber-800 text-sm mb-4 flex items-center gap-2"><i class="fa-solid fa-rocket"></i> ترحيل الطلاب للسنة القادمة</h4>
-                                 <div class="flex items-center gap-4">
-                                     <select id="promote-to-year" class="p-3 rounded-xl border border-amber-200 bg-white text-sm font-bold flex-1"></select>
-                                     <button onclick="promoteStudents()" class="bg-amber-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-amber-600 transition shadow-lg shadow-amber-200 text-sm">بدء الترحيل الآلي</button>
-                                 </div>
-                                 <p class="text-[10px] text-amber-700 mt-2">سيقوم النظام بنقل الطلاب للصف التالي (بناءً على الترتيب) وتصفير المدفوعات في العام الجديد.</p>
-                             </div>
-                         </div>
-                    </div>
-
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-lg mb-6 flex items-center gap-2 text-slate-700"><i class="fa-solid fa-school"></i> بيانات المدرسة</h3>
-                        <div class="space-y-4">
-                            <input type="text" id="set-school-name" class="input-std" placeholder="اسم المدرسة">
-                            <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                                <img id="settings-logo-preview" src="" class="w-16 h-16 object-contain bg-white rounded-xl border p-1">
-                                <div class="flex-1">
-                                    <label class="block text-xs font-bold text-slate-400 mb-2">شعار المدرسة (PNG/JPG)</label>
-                                    <input type="file" id="set-logo-file" onchange="handleLogoUpload(this, false)" class="text-xs w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                                </div>
-                            </div>
-                            <button onclick="saveIdentity()" class="btn-main w-full py-3 text-sm bg-slate-800 hover:bg-slate-900 shadow-none">حفظ البيانات الأساسية</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-lg mb-6 flex items-center gap-2 text-slate-700"><i class="fa-solid fa-database"></i> النسخ الاحتياطي والاستيراد</h3>
-                        <div class="space-y-4">
-                            <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 relative overflow-hidden group">
-                                <h4 class="font-bold text-emerald-800 mb-2 text-sm">استيراد من Excel</h4>
-                                <input type="file" onchange="importExcel(this)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                <div class="flex items-center justify-between text-emerald-600">
-                                    <span class="text-xs">اضغط لاختيار ملف .xlsx</span>
-                                    <i class="fa-solid fa-file-excel text-xl group-hover:scale-110 transition"></i>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-3">
-                                <button onclick="exportBackup()" class="bg-blue-50 text-blue-600 border border-blue-100 p-4 rounded-2xl font-bold text-xs hover:bg-blue-100 transition flex flex-col items-center gap-2">
-                                    <i class="fa-solid fa-download text-xl"></i> تحميل نسخة احتياطية
-                                </button>
-                                <div class="bg-slate-50 text-slate-600 border border-slate-200 p-4 rounded-2xl font-bold text-xs hover:bg-slate-100 transition flex flex-col items-center gap-2 relative overflow-hidden">
-                                    <i class="fa-solid fa-upload text-xl"></i> استعادة نسخة
-                                    <input type="file" onchange="restoreBackup(this)" class="absolute inset-0 opacity-0 cursor-pointer">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200 lg:col-span-2">
-                        <div class="flex gap-8 border-b border-slate-100 pb-4 mb-4">
-                            <button onclick="toggleSettingsTab('grades')" class="font-bold text-indigo-600 border-b-2 border-indigo-600 pb-1">الصفوف والأسعار</button>
-                            <button onclick="toggleSettingsTab('users')" class="font-bold text-slate-400 hover:text-slate-600 pb-1">المستخدمين</button>
-                        </div>
-
-                        <div id="set-tab-grades">
-                            <div class="flex gap-3 mb-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                <input type="number" id="new-grade-order" placeholder="الترتيب (1,2..)" class="w-20 p-2 rounded-lg border text-sm text-center" title="ترتيب الصعود">
-                                <input type="text" id="new-grade-name" placeholder="اسم الصف" class="flex-1 p-2 rounded-lg border text-sm">
-                                <input type="number" id="new-grade-price" placeholder="السعر" class="w-24 p-2 rounded-lg border text-sm">
-                                <button onclick="addGrade()" class="bg-emerald-500 text-white px-4 rounded-lg font-bold hover:bg-emerald-600">+</button>
-                            </div>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-h-40 overflow-y-auto custom-scroll" id="grades-list"></div>
-                        </div>
-
-                        <div id="set-tab-users" class="hidden">
-                            <div class="flex gap-3 mb-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                <input type="text" id="new-u-name" placeholder="الاسم" class="flex-1 p-2 rounded-lg border text-sm">
-                                <input type="number" id="new-u-pin" placeholder="الرمز (4)" class="w-24 p-2 rounded-lg border text-sm">
-                                <select id="new-u-role" class="p-2 rounded-lg border text-sm w-32"><option value="staff">موظف</option><option value="admin">مدير</option></select>
-                                <button onclick="addNewUser()" class="bg-slate-800 text-white px-4 rounded-lg font-bold text-sm">إضافة</button>
-                            </div>
-                            <table class="w-full text-right text-sm"><thead class="bg-slate-100"><tr><th class="p-2">الاسم</th><th class="p-2">الرمز</th><th class="p-2">الصلاحية</th><th class="p-2">حذف</th></tr></thead><tbody id="users-table-body" class="font-bold divide-y"></tbody></table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-<div id="print-area"></div>
-
-    <script type="module">
-        // 1. استيراد مكتبات Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // 2. إعدادات Firebase (استخدم إعداداتك الخاصة هنا إذا لزم الأمر)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBPdIGZ-V1efsO4Ohzq6ioRoBR4YyDzQb0", // استبدل هذا بمفتاحك الخاص عند النشر الفعلي
-            authDomain: "schoolsystem-7be7a.firebaseapp.com",
-            projectId: "schoolsystem-7be7a",
-            storageBucket: "schoolsystem-7be7a.firebasestorage.app",
-            messagingSenderId: "191775387521",
-            appId: "1:191775387521:web:9009678837327f697d8280"
-        };
-
-        // تهيئة التطبيق
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const dbCloud = getFirestore(app);
-        const provider = new GoogleAuthProvider();
-
-        // ------------------------------------------------------------
-        // 3. إدارة الحالة العامة (Global State)
-        // ------------------------------------------------------------
-        
-        // أ. المتغيرات العامة
-        let currentUser = null;         // المستخدم المسجل حالياً (بالرمز)
-        let schoolEmail = null;         // إيميل المدرسة (المفتاح الرئيسي)
-        let selectedYear = "";          // السنة المالية المختارة (مثلاً: "2025-2026")
-        
-        // ب. مخزن البيانات (Data Stores)
-        // globalConfig: يحتوي على المستخدمين، الشعار، واسم المدرسة (مشترك بين كل السنوات)
-        window.globalConfig = { 
-            schoolName: 'مدرستي', 
-            logo: '', 
-            users: [], 
-            yearsList: [] 
-        };
-
-        // yearData: يحتوي على بيانات السنة المحددة فقط (طلاب، فواتير، صفوف)
-        window.yearData = { 
-            parents: [], 
-            transactions: [], 
-            grades: [] 
-        };
-
-        // مخزن مؤقت لعمليات الدخول
-        let pinBuffer = "";
-        let tempStudentsBuffer = [];
-        let activeParentReceipt = null;
-
-        // ------------------------------------------------------------
-        // 4. دوال التوثيق والتهيئة (Authentication & Init)
-        // ------------------------------------------------------------
-
-        // تسجيل الدخول بحساب Google
-        window.signInWithGoogle = () => {
-            document.getElementById('login-status').classList.remove('hidden');
-            signInWithPopup(auth, provider)
-                .then(() => { /* سيتم التعامل معه في onAuthStateChanged */ })
-                .catch(err => {
-                    alert("خطأ في الاتصال: " + err.message);
-                    document.getElementById('login-status').classList.add('hidden');
-                });
-        };
-
-        // تسجيل الخروج الكامل (فصل السحابة)
-        window.fullLogout = () => {
-            if(confirm("هل أنت متأكد من فصل حساب المدرسة السحابي؟\nسيتطلب ذلك إعادة تسجيل الدخول بحساب Google.")) {
-                signOut(auth).then(() => location.reload());
-            }
-        };
-
-        // مراقب حالة الدخول
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                schoolEmail = user.email;
-                document.getElementById('view-google-login').classList.add('hidden');
-                document.getElementById('view-pin-login').classList.remove('hidden');
-                document.getElementById('cloud-email-display').innerText = user.email;
-                
-                // تحميل الإعدادات العامة أولاً
-                await loadGlobalConfig();
-            } else {
-                document.getElementById('view-google-login').classList.remove('hidden');
-                document.getElementById('view-pin-login').classList.add('hidden');
-            }
-        });
-
-        // حساب السنة الدراسية الحالية تلقائياً
-        function calculateAutoYear() {
-            const today = new Date();
-            const month = today.getMonth() + 1; // 1-12
-            const year = today.getFullYear();
-            
-            // إذا كنا في شهر 9 (سبتمبر) أو بعده، فنحن في بداية سنة دراسية جديدة (مثلاً 2025-2026)
-            // إذا كنا قبل شهر 9، فنحن في تكملة السنة السابقة (مثلاً 2024-2025)
-            if (month >= 9) {
-                return `${year}-${year + 1}`;
-            } else {
-                return `${year - 1}-${year}`;
-            }
-        }
-
-        // تحميل الإعدادات العامة (Users, Logo, Years List)
-        async function loadGlobalConfig() {
-            try {
-                const docRef = doc(dbCloud, "schools", schoolEmail);
-                const snap = await getDoc(docRef);
-                
-                if (snap.exists()) {
-                    window.globalConfig = snap.data();
-                } else {
-                    // إنشاء إعدادات افتراضية لأول مرة
-                    const autoYear = calculateAutoYear();
-                    window.globalConfig = {
-                        schoolName: 'مدرسة جديدة',
-                        logo: '',
-                        users: [{id: 1, name: 'المدير العام', pin: '1111', role: 'admin'}], // مستخدم افتراضي
-                        yearsList: [autoYear]
-                    };
-                    await setDoc(docRef, window.globalConfig);
-                }
-                
-                // تحديث واجهة اختيار السنة
-                renderYearsDropdown();
-                renderLoginUsers();
-                
-                // تحديث الشعار والاسم في شاشة الدخول
-                document.getElementById('school-name-display').innerHTML = window.globalConfig.schoolName;
-                
-            } catch (e) {
-                console.error("Error Loading Config:", e);
-                alert("حدث خطأ أثناء تحميل إعدادات المدرسة. تأكد من الاتصال بالإنترنت.");
-            }
-        }
-
-        // تحميل بيانات السنة المختارة
-        async function loadYearData(year) {
-            try {
-                // مسار قاعدة البيانات: schools/{email}/years/{year}
-                const yearDocRef = doc(dbCloud, "schools", schoolEmail, "years", year);
-                const snap = await getDoc(yearDocRef);
-                
-                if (snap.exists()) {
-                    window.yearData = snap.data();
-                } else {
-                    // سنة جديدة فارغة
-                    window.yearData = {
-                        parents: [],
-                        transactions: [],
-                        grades: []
-                    };
-                    await setDoc(yearDocRef, window.yearData);
-                }
-                console.log(`Loaded Data for Year: ${year}`);
-            } catch (e) {
-                console.error("Error Loading Year Data:", e);
-            }
-        }
-
-        // حفظ الإعدادات العامة
-        window.saveGlobalConfig = async () => {
-            if(!schoolEmail) return;
-            await setDoc(doc(dbCloud, "schools", schoolEmail), window.globalConfig);
-        };
-
-        // حفظ بيانات السنة الحالية
-        window.saveYearData = async () => {
-            if(!schoolEmail || !selectedYear) return;
-            await setDoc(doc(dbCloud, "schools", schoolEmail, "years", selectedYear), window.yearData);
-        };
-
-        // ------------------------------------------------------------
-        // 5. واجهة تسجيل الدخول واختيار السنة (Login UI)
-        // ------------------------------------------------------------
-
-        function renderYearsDropdown() {
-            const select = document.getElementById('login-year-select');
-            const autoYear = calculateAutoYear();
-            
-            // التأكد من أن السنة الحالية موجودة في القائمة
-            if (!window.globalConfig.yearsList.includes(autoYear)) {
-                window.globalConfig.yearsList.push(autoYear);
-                saveGlobalConfig();
-            }
-
-            // ترتيب السنوات تنازلياً (الأحدث أولاً)
-            const sortedYears = window.globalConfig.yearsList.sort().reverse();
-            
-            select.innerHTML = sortedYears.map(y => 
-                `<option value="${y}" ${y === autoYear ? 'selected' : ''}>${y} ${y === autoYear ? '(الحالي)' : ''}</option>`
-            ).join('');
-        }
-
-        function renderLoginUsers() {
-            document.getElementById('login-users-container').innerHTML = window.globalConfig.users.map(u => `
-                <div onclick="selectLoginUser(${u.id}, '${u.name}')" class="bg-white/10 hover:bg-white/20 p-3 rounded-2xl cursor-pointer flex items-center gap-3 transition border border-white/5 group">
-                    <div class="w-10 h-10 bg-indigo-500 group-hover:bg-indigo-400 rounded-full flex items-center justify-center font-bold text-lg text-white transition">${u.name[0]}</div>
-                    <div class="text-white text-right flex-1">
-                        <p class="font-bold text-sm leading-tight">${u.name}</p>
-                        <p class="text-[10px] opacity-70 uppercase tracking-wider">${u.role === 'admin' ? 'مدير نظام' : 'موظف'}</p>
-                    </div>
-                    <i class="fa-solid fa-chevron-left text-xs opacity-0 group-hover:opacity-100 transition"></i>
-                </div>
-            `).join('');
-        }
-
-        let tempSelectedUserId = null;
-
-        window.selectLoginUser = (id, name) => {
-            tempSelectedUserId = id;
-            document.getElementById('pin-target-name').innerText = name;
-            // تفعيل لوحة الأرقام
-            const pad = document.getElementById('pin-pad-area');
-            pad.classList.remove('opacity-50', 'pointer-events-none', 'scale-95');
-            pad.classList.add('opacity-100', 'scale-100');
-            window.clearPin();
-        };
-
-        window.typePin = (n) => { 
-            if(pinBuffer.length < 4) { 
-                pinBuffer += n; 
-                updatePinDots(); 
-            } 
-        };
-        
-        window.clearPin = () => { 
-            pinBuffer = ""; 
-            updatePinDots(); 
-            // إعادة تعيين ألوان النقاط (إزالة الخطأ)
-            for(let i=1; i<=4; i++) document.getElementById(`pd-${i}`).classList.remove('error');
-        };
-        
-        function updatePinDots() { 
-            for(let i=1; i<=4; i++) {
-                document.getElementById(`pd-${i}`).classList.toggle('active', i <= pinBuffer.length);
-            }
-        }
-
-        window.submitPin = async () => {
-            const user = window.globalConfig.users.find(x => x.id === tempSelectedUserId);
-            
-            if(user && user.pin === pinBuffer) {
-                // 1. تعيين المستخدم
-                currentUser = user;
-                
-                // 2. تعيين السنة المختارة
-                selectedYear = document.getElementById('login-year-select').value;
-                
-                // 3. تحميل بيانات تلك السنة
-                const loadingBtn = document.querySelector('#pin-pad-area button[onclick="submitPin()"]');
-                loadingBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-                
-                await loadYearData(selectedYear);
-                
-                // 4. الانتقال للوحة التحكم
-                document.getElementById('view-pin-login').classList.add('hidden');
-                document.getElementById('view-dashboard').classList.remove('hidden');
-                initDashboard();
-                loadingBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i>'; // Reset btn
-            } else { 
-                // رمز خاطئ
-                // اهتزاز النقاط باللون الأحمر
-                for(let i=1; i<=4; i++) document.getElementById(`pd-${i}`).classList.add('error');
-                setTimeout(clearPin, 400);
-            }
-        };
-
-        window.userLogout = () => { 
-            currentUser = null; 
-            selectedYear = null;
-            location.reload(); 
-        };
-
-        // ------------------------------------------------------------
-        // 6. تهيئة لوحة التحكم (Dashboard Init)
-        // ------------------------------------------------------------
-
-        function initDashboard() {
-            // تعيين النصوص الأساسية
-            document.getElementById('dash-school-title').innerText = window.globalConfig.schoolName;
-            document.getElementById('current-user-name').innerText = currentUser.name;
-            document.getElementById('current-user-role').innerText = currentUser.role === 'admin' ? 'مدير النظام' : 'موظف';
-            document.getElementById('dash-year-display').innerText = selectedYear;
-
-            // الشعار
-            if(window.globalConfig.logo) {
-                const logoImg = document.getElementById('dash-logo');
-                logoImg.src = window.globalConfig.logo;
-                logoImg.classList.remove('hidden');
-                document.getElementById('dash-logo-placeholder').classList.add('hidden');
-            }
-
-            // إخفاء زر الإعدادات لغير المسؤولين
-            if(currentUser.role !== 'admin') {
-                const btn = document.getElementById('hub-settings-btn');
-                if(btn) {
-                    btn.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
-                    btn.onclick = () => alert("عذراً، هذه الصلاحية للمدراء فقط.");
-                }
-            }
-            
-            // تحديث الإحصائيات السريعة في الداشبورد (اختياري)
-            updateDashStats();
-        }
-
-        function updateDashStats() {
-            // يمكن إضافة كود هنا لتحديث أرقام الداشبورد الرئيسية إذا لزم الأمر
-        }
-
-        // ------------------------------------------------------------
-        // 7. التنقل (Navigation)
-        // ------------------------------------------------------------
-        
-        window.nav = (mod) => {
-            // التحقق من الصلاحية للإعدادات
-            if(mod === 'settings' && currentUser.role !== 'admin') return;
-
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-modules').classList.remove('hidden');
-            
-            // إخفاء كل الوحدات
-            document.querySelectorAll('.module-view').forEach(e => e.classList.add('hidden'));
-            
-            // إظهار الوحدة المطلوبة
-            document.getElementById('mod-'+mod).classList.remove('hidden');
-            
-            // تحديث العناوين
-            const titles = {
-                'parents': 'إدارة شؤون الطلاب والعائلات',
-                'receipts': 'نظام القبض المالي',
-                'payments': 'نظام المصروفات',
-                'reports': 'التقارير المالية والديون',
-                'others': 'السجلات والإقفال اليومي',
-                'settings': 'إعدادات النظام'
-            };
-            document.getElementById('module-title').innerText = titles[mod];
-            document.getElementById('mod-header-year').innerText = selectedYear;
-
-            // تهيئة الوحدة
-            if(mod === 'parents') initParentsModule();
-            if(mod === 'receipts') initReceiptsModule();
-            if(mod === 'reports') initReportsModule();
-            if(mod === 'others') initOthersModule();
-            if(mod === 'settings') initSettingsModule();
-        }
-
-        window.goHome = () => {
-            document.getElementById('view-modules').classList.add('hidden');
-            document.getElementById('view-dashboard').classList.remove('hidden');
-            updateDashStats(); // تحديث الأرقام عند العودة
-        }
-
-        // ------------------------------------------------------------
-        // 8. منطق صفحة الإعدادات (Settings Logic)
-        // ------------------------------------------------------------
-        
-        function initSettingsModule() {
-            // تعبئة الحقول
-            document.getElementById('set-school-name').value = window.globalConfig.schoolName;
-            if(window.globalConfig.logo) document.getElementById('settings-logo-preview').src = window.globalConfig.logo;
-            
-            renderGradesList();
-            renderUsersList();
-            renderPromoteYearSelect(); // تعبئة قائمة الترحيل
-        }
-
-        // أ. تبديل التبويبات الداخلية
-        window.toggleSettingsTab = (tabName) => {
-            document.getElementById('set-tab-grades').classList.add('hidden');
-            document.getElementById('set-tab-users').classList.add('hidden');
-            document.getElementById('set-tab-'+tabName).classList.remove('hidden');
-        };
-
-        // ب. حفظ الهوية والشعار
-        window.handleLogoUpload = (input, isQuick) => {
-            const file = input.files[0];
-            if (!file) return;
-            
-            // الحد من حجم الصورة (مثلاً 500KB)
-            if(file.size > 500000) {
-                alert("حجم الصورة كبير جداً. يرجى اختيار صورة أقل من 500 كيلوبايت.");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const base64 = e.target.result;
-                window.globalConfig.logo = base64;
-                await saveGlobalConfig();
-                
-                // تحديث الواجهة فوراً
-                if(isQuick) {
-                    document.getElementById('dash-logo').src = base64;
-                    document.getElementById('dash-logo').classList.remove('hidden');
-                    document.getElementById('dash-logo-placeholder').classList.add('hidden');
-                } else {
-                    document.getElementById('settings-logo-preview').src = base64;
-                }
-                alert("تم تحديث الشعار بنجاح ✅");
-            };
-            reader.readAsDataURL(file);
-        };
-
-        window.saveIdentity = async () => {
-            const name = document.getElementById('set-school-name').value;
-            if(name) {
-                window.globalConfig.schoolName = name;
-                await saveGlobalConfig();
-                document.getElementById('dash-school-title').innerText = name;
-                alert("تم حفظ بيانات المدرسة ✅");
-            }
-        };
-
-        // ج. إدارة الصفوف (Grades) مع الترتيب
-        window.addGrade = async () => {
-            const name = document.getElementById('new-grade-name').value;
-            const price = document.getElementById('new-grade-price').value;
-            const order = document.getElementById('new-grade-order').value; // حقل الترتيب الجديد
-            
-            if(name && price) {
-                window.yearData.grades.push({
-                    id: Date.now(), 
-                    name: name, 
-                    price: parseInt(price),
-                    order: parseInt(order) || 99 // افتراضي 99 إذا لم يدخل ترتيب
-                });
-                // ترتيب الصفوف حسب Order ثم Name
-                window.yearData.grades.sort((a,b) => (a.order - b.order));
-                
-                await saveYearData();
-                renderGradesList();
-                
-                // مسح الحقول
-                document.getElementById('new-grade-name').value = "";
-                document.getElementById('new-grade-price').value = "";
-                document.getElementById('new-grade-order').value = "";
-            } else {
-                alert("يرجى إدخال اسم الصف والسعر");
-            }
-        };
-
-        function renderGradesList() {
-            const container = document.getElementById('grades-list');
-            container.innerHTML = window.yearData.grades.map(g => `
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center relative group">
-                    <button onclick="deleteGrade(${g.id})" class="absolute top-1 left-1 text-rose-300 hover:text-rose-500 hidden group-hover:block"><i class="fa-solid fa-times-circle"></i></button>
-                    <div class="text-[10px] text-slate-400 font-bold border-b pb-1 mb-1">ترتيب: ${g.order || '-'}</div>
-                    <div class="text-xs font-bold text-slate-800">${g.name}</div>
-                    <div class="text-indigo-600 font-black mt-1">${g.price.toLocaleString()}</div>
-                </div>
-            `).join('');
-        }
-        
-        window.deleteGrade = async (id) => {
-            if(confirm("هل تريد حذف هذا الصف؟")) {
-                window.yearData.grades = window.yearData.grades.filter(g => g.id !== id);
-                await saveYearData();
-                renderGradesList();
-            }
-        };
-
-        // د. إدارة المستخدمين (Users)
-        window.addNewUser = async () => {
-            const name = document.getElementById('new-u-name').value;
-            const pin = document.getElementById('new-u-pin').value;
-            const role = document.getElementById('new-u-role').value;
-            
-            if(name && pin.length === 4) {
-                // التحقق من عدم تكرار الرمز
-                if(window.globalConfig.users.some(u => u.pin === pin)) {
-                    return alert("هذا الرمز مستخدم بالفعل لموظف آخر!");
-                }
-
-                window.globalConfig.users.push({id: Date.now(), name, pin, role});
-                await saveGlobalConfig();
-                renderUsersList();
-                
-                document.getElementById('new-u-name').value = "";
-                document.getElementById('new-u-pin').value = "";
-            } else {
-                alert("تأكد من الاسم وأن الرمز مكون من 4 أرقام");
-            }
-        };
-
-        function renderUsersList() {
-            document.getElementById('users-table-body').innerHTML = window.globalConfig.users.map(u => `
-                <tr class="border-b hover:bg-slate-50">
-                    <td class="p-3 font-bold">${u.name}</td>
-                    <td class="p-3"><span class="bg-slate-100 font-mono px-2 py-1 rounded text-xs tracking-widest">****</span></td>
-                    <td class="p-3"><span class="badge ${u.role==='admin'?'badge-danger':'badge-info'}">${u.role}</span></td>
-                    <td class="p-3">
-                        <button onclick="delUser(${u.id})" class="text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        window.delUser = async (id) => {
-            if(id === currentUser.id) return alert("لا يمكنك حذف حسابك الحالي وأنت تستخدمه!");
-            if(confirm("هل أنت متأكد من حذف هذا المستخدم؟")) {
-                window.globalConfig.users = window.globalConfig.users.filter(u => u.id !== id);
-                await saveGlobalConfig();
-                renderUsersList();
-            }
-        };
-
-        // هـ. إدارة السنوات (New Year & Promotion)
-        window.createNewYear = async () => {
-            const input = document.getElementById('new-year-input');
-            const newYear = input.value.trim(); // ex: 2026-2027
-            
-            // Regex للتأكد من الصيغة YYYY-YYYY
-            const yearRegex = /^\d{4}-\d{4}$/;
-            if(!yearRegex.test(newYear)) return alert("يرجى كتابة السنة بالصيغة الصحيحة: 2025-2026");
-
-            if(window.globalConfig.yearsList.includes(newYear)) return alert("هذه السنة موجودة بالفعل!");
-
-            if(confirm(`هل تريد إنشاء قاعدة بيانات جديدة للعام ${newYear}؟\n(لن يتم حذف البيانات القديمة، يمكنك التبديل بينها)`)) {
-                // 1. إضافة للسجل العام
-                window.globalConfig.yearsList.push(newYear);
-                await saveGlobalConfig();
-                
-                // 2. إنشاء مستند فارغ للسنة الجديدة في Firebase
-                // (حتى لو لم ننتقل إليها الآن، نضمن وجودها)
-                const newYearRef = doc(dbCloud, "schools", schoolEmail, "years", newYear);
-                await setDoc(newYearRef, {
-                    parents: [],
-                    transactions: [],
-                    grades: [] // يمكن نسخ الصفوف الحالية لتسهيل الأمر
-                });
-
-                alert("تم إنشاء السنة الجديدة بنجاح.\nيمكنك الآن تسجيل الخروج واختيارها من القائمة.");
-                input.value = "";
-                renderPromoteYearSelect();
-            }
-        };
-        
-        function renderPromoteYearSelect() {
-            const sel = document.getElementById('promote-to-year');
-            // عرض كل السنوات ما عدا السنة الحالية
-            const otherYears = window.globalConfig.yearsList.filter(y => y !== selectedYear);
-            sel.innerHTML = otherYears.map(y => `<option value="${y}">${y}</option>`).join('');
-        }
-        
-        // منطق ترحيل الطلاب (Advanced Promotion)
-        window.promoteStudents = async () => {
-            const targetYear = document.getElementById('promote-to-year').value;
-            if(!targetYear) return alert("لا توجد سنوات أخرى للترحيل إليها. قم بإنشاء سنة جديدة أولاً.");
-            
-            if(!confirm(`⚠️ تحذير هام!\n\nأنت على وشك ترحيل الطلاب من (${selectedYear}) إلى (${targetYear}).\n\n- سيتم نقل الطلاب. \n- سيتم ترقية صفهم الدراسي للصف التالي (بناءً على الترتيب).\n- سيتم تصفير الرسوم المدفوعة في العام الجديد.\n\nهل أنت متأكد تماماً؟`)) return;
-            
-            try {
-                // 1. جلب بيانات السنة المستهدفة
-                const targetRef = doc(dbCloud, "schools", schoolEmail, "years", targetYear);
-                const targetSnap = await getDoc(targetRef);
-                let targetData = targetSnap.exists() ? targetSnap.data() : { parents: [], transactions: [], grades: [] };
-                
-                // إذا لم يكن في السنة الجديدة صفوف، ننسخ صفوف السنة الحالية
-                if(!targetData.grades || targetData.grades.length === 0) {
-                    targetData.grades = JSON.parse(JSON.stringify(window.yearData.grades));
-                }
-
-                // 2. تجهيز العائلات للترحيل
-                let promotedCount = 0;
-                
-                // تكرار على عائلات السنة الحالية
-                for(const parent of window.yearData.parents) {
-                    // إنشاء نسخة جديدة من العائلة للسنة الجديدة
-                    // (بدون سجل المدفوعات القديم، وتصفير الدفع)
-                    let newParent = {
-                        ...parent,
-                        id: Date.now() + Math.floor(Math.random()*1000), // ID جديد لتجنب التضارب
-                        totalFees: 0,
-                        paid: 0,
-                        students: []
-                    };
-                    
-                    // معالجة الطلاب
-                    for(const student of parent.students) {
-                        // البحث عن الصف الحالي
-                        const currentGradeObj = window.yearData.grades.find(g => g.name === student.gradeName);
-                        
-                        if(currentGradeObj) {
-                            // البحث عن الصف التالي (الذي ترتيبه أعلى بـ 1 أو أكثر)
-                            // نفترض أن الترتيب 1، 2، 3. التالي هو الترتيب > الحالي
-                            // نقوم بترتيب صفوف السنة الجديدة
-                            const sortedTargetGrades = targetData.grades.sort((a,b) => a.order - b.order);
-                            const nextGrade = sortedTargetGrades.find(g => g.order > currentGradeObj.order);
-                            
-                            if(nextGrade) {
-                                // ترحيل للصف التالي
-                                newParent.students.push({
-                                    name: student.name,
-                                    mother: student.mother,
-                                    gradeName: nextGrade.name,
-                                    price: nextGrade.price
-                                });
-                                newParent.totalFees += nextGrade.price;
-                            } else {
-                                // لا يوجد صف تالي (ربما تخرج؟) -> يمكن إبقاؤه في نفس الصف أو تخطيه
-                                // هنا سنبقيه في نفس الصف كاحتياط، أو يمكن إضافة منطق "خريج"
-                                newParent.students.push({
-                                    ...student,
-                                    price: currentGradeObj.price // السعر قد يتغير في السنة الجديدة
-                                });
-                                newParent.totalFees += currentGradeObj.price;
-                            }
-                        } else {
-                            // الصف غير معروف، انقله كما هو
-                            newParent.students.push(student);
-                            newParent.totalFees += student.price;
-                        }
-                    }
-                    
-                    // إضافة العائلة للسنة الجديدة فقط إذا كان لديها طلاب
-                    if(newParent.students.length > 0) {
-                        targetData.parents.push(newParent);
-                        promotedCount++;
-                    }
-                }
-                
-                // 3. حفظ السنة المستهدفة
-                await setDoc(targetRef, targetData);
-                
-                alert(`تمت عملية الترحيل بنجاح!\nتم ترحيل ${promotedCount} عائلة إلى سنة ${targetYear}.`);
-                
-            } catch (e) {
-                console.error(e);
-                alert("حدث خطأ أثناء الترحيل: " + e.message);
-            }
-        };
-
-    </script>
