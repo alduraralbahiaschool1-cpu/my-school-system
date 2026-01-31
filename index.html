@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+print("""<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -242,6 +243,11 @@
             background-color: #f8fafc;
             transform: translateX(-5px);
         }
+        
+        /* Custom grid for RTL */
+        .dir-ltr {
+            direction: ltr;
+        }
     </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col antialiased">
@@ -268,22 +274,6 @@
                 <span class="text-lg">تسجيل الدخول بحساب Google</span>
             </button>
             
-            <div class="flex items-center gap-3 mb-6">
-                <div class="h-px bg-slate-200 flex-1"></div>
-                <span class="text-slate-400 text-sm font-bold">بيانات الدخول الافتراضية</span>
-                <div class="h-px bg-slate-200 flex-1"></div>
-            </div>
-            
-            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                <p class="text-sm text-slate-600 mb-2">
-                    <span class="font-bold text-indigo-600">المستخدم:</span> admin
-                </p>
-                <p class="text-sm text-slate-600">
-                    <span class="font-bold text-indigo-600">الرمز:</span> 1111
-                </p>
-                <p class="text-xs text-slate-400 mt-3">يتم إنشاء هذا المستخدم تلقائياً عند أول دخول</p>
-            </div>
-            
             <!-- Status Message -->
             <p id="login-status" class="mt-8 text-sm text-indigo-600 font-black animate-pulse hidden">
                 <i class="fa-solid fa-circle-notch fa-spin ml-2"></i>
@@ -295,7 +285,9 @@
             <p>© 2025 النظام المالي المتكامل - جميع الحقوق محفوظة</p>
         </div>
     </div>
+""")
 
+print("""
     <!-- ========================================== -->
     <!-- 2. YEAR SELECTION LAYER                    -->
     <!-- ========================================== -->
@@ -315,7 +307,7 @@
                 <div class="flex gap-4 justify-center max-w-md mx-auto">
                     <input type="text" id="new-year-input" placeholder="مثال: 2026-2027" class="input-std text-center flex-1">
                     <button onclick="createNewYear()" class="btn-emerald whitespace-nowrap">
-                        <i class="fa-solid fa-plus ml-2"></i>إنشاء
+                        <i class="fa-solid fa-plus ml-2"></i> إنشاء
                     </button>
                 </div>
                 <p class="text-center text-xs text-slate-400 mt-4">عند إنشاء عام جديد، يمكنك ترقية الطلاب من العام السابق</p>
@@ -336,7 +328,7 @@
                         <span class="text-sm font-mono bg-slate-800 px-3 py-1 rounded-lg" id="cloud-email-display"> waiting...</span>
                         <span id="current-year-display" class="bg-indigo-600 px-4 py-1.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/30">2025-2026</span>
                         <button onclick="changeYear()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-indigo-200 transition border border-white/10">
-                            <i class="fa-solid fa-rotate ml-1"></i>تغيير العام
+                            <i class="fa-solid fa-rotate ml-1"></i> تغيير العام
                         </button>
                     </div>
                     
@@ -376,7 +368,7 @@
                         <div class="pin-dot" id="pd-4"></div>
                     </div>
                     <p id="pin-error" class="text-rose-400 text-sm mt-4 h-6 opacity-0 transition-opacity font-bold">
-                        <i class="fa-solid fa-circle-exclamation ml-1"></i>رمز غير صحيح
+                        <i class="fa-solid fa-circle-exclamation ml-1"></i> رمز غير صحيح
                     </p>
                 </div>
                 
@@ -401,6 +393,9 @@
             </div>
         </div>
     </div>
+""")
+
+print("""
     <!-- ========================================== -->
     <!-- 4. DASHBOARD (مع نظام الصلاحيات)          -->
     <!-- ========================================== -->
@@ -539,7 +534,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- 5. MODULES CONTAINER                       -->
+    <!-- 5. MODULES HEADER                          -->
     <!-- ========================================== -->
     <div id="view-modules" class="hidden min-h-screen flex flex-col bg-slate-50">
         <!-- Module Header -->
@@ -560,7 +555,9 @@
         </div>
 
         <div class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full custom-scroll overflow-y-auto">
-            
+""")
+
+print("""
             <!-- A. PARENTS MODULE -->
             <div id="mod-parents" class="module-view hidden space-y-8 fade-in">
                 <!-- Add Family Form -->
@@ -784,7 +781,9 @@
                     </div>
                 </div>
             </div>
+""")
 
+print("""
             <!-- B. RECEIPTS MODULE -->
             <div id="mod-receipts" class="module-view hidden fade-in">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -910,6 +909,9 @@
                     </div>
                 </div>
             </div>
+""")
+
+print("""
             <!-- D. REPORTS MODULE -->
             <div id="mod-reports" class="module-view hidden fade-in">
                 <!-- Stats Cards -->
@@ -1048,7 +1050,7 @@
                         <textarea id="daily-notes" class="w-full p-5 rounded-2xl border-2 border-slate-200 outline-none focus:border-cyan-500 transition resize-none h-40 text-lg font-medium" placeholder="اكتب ملاحظاتك عن يوم العمل هنا..."></textarea>
                         <div class="flex justify-end mt-4">
                             <button onclick="saveDailyNotes()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-3 rounded-xl font-bold transition shadow-lg shadow-cyan-200">
-                                <i class="fa-solid fa-floppy-disk ml-2"></i>حفظ الملاحظات
+                                <i class="fa-solid fa-floppy-disk ml-2"></i> حفظ الملاحظات
                             </button>
                         </div>
                     </div>
@@ -1344,981 +1346,26 @@
 
     <!-- Print Area -->
     <div id="print-area" class="hidden"></div>
+""")
 
-    <!-- Firebase & Application Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBPdIGZ-V1efsO4Ohzq6ioRoBR4YyDzQb0",
-            authDomain: "schoolsystem-7be7a.firebaseapp.com",
-            projectId: "schoolsystem-7be7a",
-            storageBucket: "schoolsystem-7be7a.firebasestorage.app",
-            messagingSenderId: "191775387521",
-            appId: "1:191775387521:web:9009678837327f697d8280"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const dbCloud = getFirestore(app);
-        const provider = new GoogleAuthProvider();
-
-        // State Management
-        window.db = { 
-            schoolName: 'مدرستي', 
-            logo: '', 
-            users: [
-                {
-                    id: 1, 
-                    name: 'admin', 
-                    pin: '1111', 
-                    role: 'admin', 
-                    lastLogin: '-',
-                    permissions: ['all'] // Admin has all permissions
-                },
-                {
-                    id: 2, 
-                    name: 'أحمد', 
-                    pin: '2222', 
-                    role: 'staff', 
-                    lastLogin: '-',
-                    permissions: ['receipts', 'parents', 'reports'] // Limited permissions
-                }
-            ], 
-            grades: [
-                {id: 1, name: 'الصف الأول', price: 1000, order: 1},
-                {id: 2, name: 'الصف الثاني', price: 1200, order: 2}
-            ], 
-            years: ['2025-2026'], 
-            currentYear: '2025-2026' 
-        };
+print("""
+        function initSettings() { 
+            document.getElementById('set-school-name').value = window.db.schoolName; 
+            if(window.db.logo) { document.getElementById('logo-preview').innerHTML = `<img src="${window.db.logo}" class="w-full h-full object-contain">`; } 
+            renderGrades(); 
+            renderUsersTable(); 
+            const yearOpts = window.db.years.map(y => `<option value="${y}">${y}</option>`).join(''); 
+            document.getElementById('settings-current-year').innerHTML = yearOpts; 
+            document.getElementById('settings-current-year').value = window.db.currentYear; 
+            document.getElementById('promote-from-year').innerHTML = yearOpts; 
+            document.getElementById('promote-to-year').innerHTML = yearOpts; 
+        }
         
-        window.yearData = { '2025-2026': { parents: [], transactions: [], dailyNotes: {} } };
-        
-        let currentUser = null;
-        let pinBuffer = "";
-        let selectedLoginId = null;
-        let tempStudentsBuffer = [];
-        let activeParentReceipt = null;
-        let currentParentId = null;
-        let editingStudentsParentId = null;
-
-        // Auth Functions
-        window.signInWithGoogle = async () => {
-            try {
-                document.getElementById('login-status').classList.remove('hidden');
-                await signInWithPopup(auth, provider);
-            } catch(err) {
-                alert("خطأ في تسجيل الدخول: " + err.message);
-                document.getElementById('login-status').classList.add('hidden');
-            }
-        };
-
-        window.fullLogout = async () => {
-            if(confirm("هل أنت متأكد من تسجيل الخروج الكامل؟")) {
-                await signOut(auth);
-                location.reload();
-            }
-        };
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                document.getElementById('view-google-login').classList.add('hidden');
-                document.getElementById('cloud-email-display').innerText = user.email;
-                await loadData(user.email);
-                showYearSelection();
-            }
-        });
-
-        async function loadData(email) {
-            try {
-                const snap = await getDoc(doc(dbCloud, "schools", email));
-                if (snap.exists()) {
-                    const data = snap.data();
-                    window.db = data.global || window.db;
-                    window.yearData = data.years || window.yearData;
-                } else {
-                    await window.saveToCloud();
-                }
-            } catch (e) {
-                console.error("Error loading data:", e);
-                alert("خطأ في تحميل البيانات من السحابة");
-            }
-        }
-
-        window.saveToCloud = async () => {
-            if(auth.currentUser) {
-                await setDoc(doc(dbCloud, "schools", auth.currentUser.email), {
-                    global: window.db,
-                    years: window.yearData
-                });
-            }
-        };
-
-        // Year Selection
-        function showYearSelection() {
-            const container = document.getElementById('years-grid');
-            container.innerHTML = window.db.years.map(year => `
-                <button onclick="selectYear('${year}')" class="p-8 rounded-3xl border-2 ${year === window.db.currentYear ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-lg shadow-indigo-200' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300'} transition-all font-bold text-xl flex flex-col items-center gap-4 group">
-                    <div class="w-16 h-16 ${year === window.db.currentYear ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600'} rounded-2xl flex items-center justify-center text-3xl transition-all">
-                        <i class="fa-solid fa-calendar-check"></i>
-                    </div>
-                    <span>${year}</span>
-                    ${year === window.db.currentYear ? '<span class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-md">العام الحالي</span>' : ''}
-                </button>
-            `).join('');
-            document.getElementById('view-year-select').classList.remove('hidden');
-        }
-
-        window.selectYear = (year) => {
-            window.db.currentYear = year;
-            if (!window.yearData[year]) {
-                window.yearData[year] = { parents: [], transactions: [], dailyNotes: {} };
-            }
-            document.getElementById('view-year-select').classList.add('hidden');
-            document.getElementById('view-pin-login').classList.remove('hidden');
-            document.getElementById('current-year-display').innerText = year;
-            document.getElementById('dash-year-badge').innerText = year;
-            document.getElementById('module-year-badge').innerText = year;
-            renderPinUsers();
-        };
-
-        window.createNewYear = () => {
-            const input = document.getElementById('new-year-input');
-            const year = input.value.trim();
-            if (!year || window.db.years.includes(year)) {
-                alert("العام الدراسي موجود بالفعل أو غير صالح!");
-                return;
-            }
-            window.db.years.push(year);
-            window.db.years.sort();
-            window.yearData[year] = { parents: [], transactions: [], dailyNotes: {} };
-            window.saveToCloud();
-            input.value = '';
-            showYearSelection();
-            alert(`تم إنشاء العام الدراسي ${year} بنجاح`);
-        };
-
-        window.changeYear = () => {
-            document.getElementById('view-pin-login').classList.add('hidden');
-            showYearSelection();
-        };
-
-        // PIN System
-        function renderPinUsers() {
-            document.getElementById('login-users-container').innerHTML = window.db.users.map(u => `
-                <div onclick="selUser(${u.id}, '${u.name}')" class="bg-white/10 hover:bg-white/20 p-5 rounded-2xl cursor-pointer flex items-center gap-4 transition border border-white/5 hover:border-white/20 group">
-                    <div class="w-14 h-14 bg-indigo-500 group-hover:bg-white group-hover:text-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-2xl transition-all shadow-lg">
-                        ${u.name[0]}
-                    </div>
-                    <div class="text-white">
-                        <p class="font-bold text-lg">${u.name}</p>
-                        <p class="text-xs opacity-70 uppercase tracking-wider">${u.role === 'admin' ? 'مدير نظام' : 'موظف'}</p>
-                    </div>
-                    <div class="mr-auto">
-                        <i class="fa-solid fa-chevron-left text-white/30 group-hover:text-white/80 transition"></i>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        window.selUser = (id, name) => {
-            selectedLoginId = id;
-            document.getElementById('pin-target-name').innerText = name;
-            document.getElementById('pin-pad-area').classList.remove('opacity-50', 'pointer-events-none');
-            window.clearPin();
-        };
-
-        window.typePin = (n) => { 
-            if(pinBuffer.length < 4) { 
-                pinBuffer += n; 
-                updDots(); 
-            } 
-        };
-        
-        window.clearPin = () => { 
-            pinBuffer = ""; 
-            updDots(); 
-            document.getElementById('pin-error').style.opacity = '0';
-        };
-        
-        function updDots() { 
-            for(let i=1; i<=4; i++) 
-                document.getElementById(`pd-${i}`).classList.toggle('active', i <= pinBuffer.length); 
-        }
-
-        window.submitPin = async () => {
-            const u = window.db.users.find(x => x.id === selectedLoginId);
-            if(u && u.pin === pinBuffer) {
-                currentUser = u;
-                u.lastLogin = new Date().toLocaleString('ar-LY');
-                await window.saveToCloud();
-                document.getElementById('view-pin-login').classList.add('hidden');
-                document.getElementById('view-dashboard').classList.remove('hidden');
-                initDashboard();
-            } else { 
-                document.getElementById('pin-error').style.opacity = '1';
-                setTimeout(() => {
-                    window.clearPin();
-                }, 1500);
-            }
-        };
-
-        window.userLogout = () => { 
-            currentUser = null; 
-            document.getElementById('view-dashboard').classList.add('hidden'); 
-            document.getElementById('view-pin-login').classList.remove('hidden');
-            window.clearPin();
-        };
-
-        function initDashboard() {
-            document.getElementById('dash-school-name').innerText = window.db.schoolName;
-            document.getElementById('current-user-name').innerText = currentUser.name;
-            document.getElementById('current-user-role').innerText = currentUser.role === 'admin' ? 'مدير نظام' : 'موظف';
-            
-            if(window.db.logo) {
-                const img = document.getElementById('dash-logo');
-                img.src = window.db.logo;
-                img.classList.remove('hidden');
-                document.getElementById('dash-logo-placeholder').classList.add('hidden');
-            }
-
-            // Apply permissions - disable cards if no permission
-            const cards = ['receipts', 'payments', 'parents', 'reports', 'daily', 'logs', 'settings'];
-            cards.forEach(card => {
-                const element = document.getElementById(`card-${card}`);
-                if(element && !hasPermission(card)) {
-                    element.classList.add('disabled');
-                    element.style.opacity = '0.4';
-                    element.style.pointerEvents = 'none';
-                    element.style.filter = 'grayscale(1)';
-                }
-            });
-        }
-
-        function hasPermission(module) {
-            if(!currentUser) return false;
-            if(currentUser.role === 'admin') return true;
-            return currentUser.permissions && currentUser.permissions.includes(module);
-        }
-
-        window.checkPermissionAndNav = (mod) => {
-            if(!hasPermission(mod)) {
-                alert("ليس لديك صلاحية الوصول لهذا القسم");
-                return;
-            }
-            nav(mod);
-        };
-
-        window.toggleFullScreen = () => {
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-            else if (document.exitFullscreen) document.exitFullscreen();
-        };
-
-        window.nav = (mod) => {
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-modules').classList.remove('hidden');
-            document.querySelectorAll('.module-view').forEach(e => e.classList.add('hidden'));
-            document.getElementById('mod-'+mod).classList.remove('hidden');
-            
-            const titles = {
-                'parents': 'إدارة العائلات', 
-                'receipts': 'سندات القبض', 
-                'payments': 'سندات الصرف', 
-                'reports': 'التقارير المالية', 
-                'daily': 'الإغلاق اليومي', 
-                'logs': 'سجل العمليات', 
-                'settings': 'الإعدادات المتقدمة'
-            };
-            document.getElementById('module-title').innerText = titles[mod];
-            
-            if(mod === 'parents') initParents();
-            if(mod === 'receipts') initReceipts();
-            if(mod === 'reports') initReports();
-            if(mod === 'daily') initDaily();
-            if(mod === 'logs') initLogs();
-            if(mod === 'settings') initSettings();
-        };
-
-        window.goHome = () => {
-            document.getElementById('view-modules').classList.add('hidden');
-            document.getElementById('view-dashboard').classList.remove('hidden');
-        };
-
-        function getCurrentData() {
-            return window.yearData[window.db.currentYear];
-        }
-
-        // Parents Module Functions
-        function initParents() {
-            const grades = window.db.grades.sort((a,b) => a.order - b.order);
-            document.getElementById('new-student-grade').innerHTML = grades.map(g => 
-                `<option value="${g.price}" data-grade="${g.name}">${g.name} (${g.price.toLocaleString()} د.ل)</option>`
-            ).join('');
-            renderParentsTable();
-            tempStudentsBuffer = [];
-            renderTempList();
-            document.getElementById('parent-name').value = '';
-            document.getElementById('parent-phone').value = '';
-        }
-
-        window.addTempStudent = () => {
-            const name = document.getElementById('new-student-name').value.trim();
-            const mother = document.getElementById('new-student-mother').value.trim() || "-";
-            const sel = document.getElementById('new-student-grade');
-            if(name) {
-                tempStudentsBuffer.push({
-                    name, 
-                    mother, 
-                    price: parseInt(sel.value), 
-                    grade: sel.options[sel.selectedIndex].dataset.grade
-                });
-                renderTempList();
-                document.getElementById('new-student-name').value = "";
-                document.getElementById('new-student-mother').value = "";
-            }
-        };
-
-        function renderTempList() {
-            let total = 0;
-            document.getElementById('temp-students-list').innerHTML = tempStudentsBuffer.map((s, i) => {
-                total += s.price;
-                return `
-                    <div class="flex justify-between items-center bg-white p-4 rounded-xl border-2 border-slate-100 hover:border-indigo-200 transition group">
-                        <div>
-                            <span class="font-bold text-slate-700 block">${s.name}</span>
-                            <span class="text-slate-400 text-xs">${s.grade} - الأم: ${s.mother}</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg">${s.price.toLocaleString()} د.ل</span>
-                            <button onclick="tempStudentsBuffer.splice(${i},1); renderTempList();" class="w-8 h-8 bg-rose-50 text-rose-400 hover:bg-rose-500 hover:text-white rounded-lg transition flex items-center justify-center">
-                                <i class="fa-solid fa-trash text-xs"></i>
-                            </button>
-                        </div>
-                    </div>`;
-            }).join('');
-            document.getElementById('parent-total-calc').innerHTML = total.toLocaleString() + ' <span class="text-lg text-slate-400 font-medium">د.ل</span>';
-        }
-
-        window.saveFamily = async () => {
-            const name = document.getElementById('parent-name').value.trim();
-            const phone = document.getElementById('parent-phone').value.trim();
-            if(!name || tempStudentsBuffer.length === 0) {
-                alert("الرجاء إدخال اسم ولي الأمر وإضافة طالب واحد على الأقل");
-                return;
-            }
-            const total = tempStudentsBuffer.reduce((a,b) => a + b.price, 0);
-            const newParent = {
-                id: Date.now(),
-                name, 
-                phone, 
-                students: [...tempStudentsBuffer], 
-                totalFees: total, 
-                paid: 0,
-                createdAt: new Date().toLocaleDateString('ar-LY')
-            };
-            getCurrentData().parents.push(newParent);
-            await window.saveToCloud();
-            alert("تم حفظ العائلة بنجاح ✅");
-            initParents();
-        };
-
-        function renderParentsTable(query="") {
-            let parents = getCurrentData().parents.slice().reverse();
-            if(query) parents = parents.filter(p => p.name.includes(query) || p.phone.includes(query));
-            
-            document.getElementById('parents-list-body').innerHTML = parents.map(p => {
-                const remaining = p.totalFees - p.paid;
-                return `
-                    <tr class="border-b border-slate-50 hover:bg-slate-50/80 transition group">
-                        <td class="p-5 text-slate-400 font-mono text-xs">#${p.id.toString().slice(-4)}</td>
-                        <td class="p-5 font-bold text-slate-800">${p.name}</td>
-                        <td class="p-5 font-mono text-slate-500 text-xs">${p.phone}</td>
-                        <td class="p-5 text-center">
-                            <span class="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold">${p.students.length}</span>
-                        </td>
-                        <td class="p-5 font-bold text-slate-700">${p.totalFees.toLocaleString()}</td>
-                        <td class="p-5 font-bold text-emerald-600">${p.paid.toLocaleString()}</td>
-                        <td class="p-5 font-bold ${remaining > 0 ? 'text-rose-600' : 'text-emerald-600'}">${remaining.toLocaleString()}</td>
-                        <td class="p-5">
-                            <button onclick="openParentModal(${p.id})" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-3 py-2 rounded-lg font-bold transition ml-1">
-                                عرض
-                            </button>
-                            <button onclick="openEditModal(${p.id})" class="text-xs bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white px-3 py-2 rounded-lg font-bold transition">
-                                تعديل
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('') || '<tr><td colspan="8" class="p-12 text-center text-slate-400 text-lg">لا توجد عائلات مسجلة</td></tr>';
-        }
-
-        window.filterParentsTable = renderParentsTable;
-
-        // Modal Functions
-        window.openParentModal = (id) => {
-            const p = getCurrentData().parents.find(x => x.id === id);
-            if(!p) return;
-            currentParentId = id;
-            
-            document.getElementById('modal-p-name').innerText = p.name;
-            document.getElementById('modal-p-phone').innerText = p.phone || 'غير متوفر';
-            document.getElementById('modal-p-id').innerText = '#' + p.id.toString().slice(-4);
-            document.getElementById('modal-p-date').innerText = p.createdAt || '-';
-            document.getElementById('modal-p-year').innerText = window.db.currentYear;
-            
-            document.getElementById('modal-students-list').innerHTML = p.students.map(s => `
-                <div class="flex justify-between items-center p-4 hover:bg-slate-50 transition border-b border-slate-50 last:border-0">
-                    <div>
-                        <span class="font-bold text-slate-700 block text-base">${s.name}</span>
-                        <span class="text-slate-400 text-xs">الصف: ${s.grade} | الأم: ${s.mother}</span>
-                    </div>
-                    <span class="font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl">${s.price.toLocaleString()} د.ل</span>
-                </div>
-            `).join('');
-            
-            document.getElementById('modal-p-total').innerText = p.totalFees.toLocaleString() + ' د.ل';
-            document.getElementById('modal-p-paid').innerText = p.paid.toLocaleString() + ' د.ل';
-            document.getElementById('modal-p-remaining').innerText = (p.totalFees - p.paid).toLocaleString() + ' د.ل';
-            
-            document.getElementById('parent-modal').classList.remove('hidden');
-        };
-
-        window.closeParentModal = () => {
-            document.getElementById('parent-modal').classList.add('hidden');
-        };
-
-        // Edit Students Modal Functions (NEW)
-        window.openStudentsEditModal = () => {
-            const p = getCurrentData().parents.find(x => x.id === currentParentId);
-            if(!p) return;
-            editingStudentsParentId = currentParentId;
-            
-            // Populate grades select
-            const grades = window.db.grades.sort((a,b) => a.order - b.order);
-            document.getElementById('edit-new-student-grade').innerHTML = grades.map(g => 
-                `<option value="${g.price}" data-grade="${g.name}">${g.name} (${g.price} د.ل)</option>`
-            ).join('');
-            
-            // Populate existing students
-            document.getElementById('edit-students-list').innerHTML = p.students.map((s, idx) => `
-                <div class="student-edit-item bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <div class="grid grid-cols-12 gap-3 items-center">
-                        <div class="col-span-4">
-                            <label class="text-xs text-slate-500 block mb-1">اسم الطالب</label>
-                            <input type="text" class="student-edit-name-${idx} input-std text-sm w-full h-10 p-2" value="${s.name}">
-                        </div>
-                        <div class="col-span-3">
-                            <label class="text-xs text-slate-500 block mb-1">الأم</label>
-                            <input type="text" class="student-edit-mother-${idx} input-std text-sm w-full h-10 p-2" value="${s.mother}">
-                        </div>
-                        <div class="col-span-3">
-                            <label class="text-xs text-slate-500 block mb-1">الصف</label>
-                            <select class="student-edit-grade-${idx} input-std text-sm w-full h-10 p-2 bg-white">
-                                ${grades.map(g => `<option value="${g.price}" ${g.name === s.grade ? 'selected' : ''} data-grade="${g.name}">${g.name}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="col-span-2 flex items-end">
-                            <button onclick="removeStudentFromEdit(${idx})" class="w-full h-10 bg-rose-100 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition font-bold text-xs">
-                                <i class="fa-solid fa-trash"></i> حذف
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            document.getElementById('edit-students-modal').classList.remove('hidden');
-        };
-
-        window.closeStudentsEditModal = () => {
-            document.getElementById('edit-students-modal').classList.add('hidden');
-            editingStudentsParentId = null;
-        };
-
-        window.removeStudentFromEdit = (idx) => {
-            if(confirm("حذف هذا الطالب من القائمة؟")) {
-                const p = getCurrentData().parents.find(x => x.id === editingStudentsParentId);
-                if(p && p.students[idx]) {
-                    p.students.splice(idx, 1);
-                    openStudentsEditModal(); // Refresh
-                }
-            }
-        };
-
-        window.addStudentToExisting = () => {
-            const name = document.getElementById('edit-new-student-name').value.trim();
-            const mother = document.getElementById('edit-new-student-mother').value.trim() || "-";
-            const sel = document.getElementById('edit-new-student-grade');
-            
-            if(!name) {
-                alert("أدخل اسم الطالب");
-                return;
-            }
-            
-            const p = getCurrentData().parents.find(x => x.id === editingStudentsParentId);
-            if(p) {
-                const price = parseInt(sel.value);
-                const grade = sel.options[sel.selectedIndex].dataset.grade;
-                p.students.push({name, mother, price, grade});
-                document.getElementById('edit-new-student-name').value = '';
-                document.getElementById('edit-new-student-mother').value = '';
-                openStudentsEditModal(); // Refresh list
-            }
-        };
-
-        window.saveStudentsEdit = async () => {
-            const p = getCurrentData().parents.find(x => x.id === editingStudentsParentId);
-            if(!p) return;
-            
-            // Recalculate totals based on current students and their prices
-            let newTotal = 0;
-            p.students.forEach(s => {
-                newTotal += s.price;
-            });
-            
-            // Update total fees (keep paid as is, but warn if paid > new total)
-            p.totalFees = newTotal;
-            if(p.paid > newTotal) {
-                alert("تنبيه: المبلغ المدفوع أكبر من الرسوم الجديدة!");
-            }
-            
-            await window.saveToCloud();
-            closeStudentsEditModal();
-            closeParentModal();
-            renderParentsTable();
-            alert("تم تحديث بيانات الأبناء بنجاح");
-        };
-
-        window.openEditModal = (id) => {
-            const p = getCurrentData().parents.find(x => x.id === id);
-            if(!p) return;
-            currentParentId = id;
-            document.getElementById('edit-p-id').value = id;
-            document.getElementById('edit-p-name').value = p.name;
-            document.getElementById('edit-p-phone').value = p.phone;
-            document.getElementById('edit-parent-modal').classList.remove('hidden');
-        };
-
-        window.saveParentEdit = async () => {
-            const p = getCurrentData().parents.find(x => x.id == currentParentId);
-            if(p) {
-                p.name = document.getElementById('edit-p-name').value;
-                p.phone = document.getElementById('edit-p-phone').value;
-                await window.saveToCloud();
-                document.getElementById('edit-parent-modal').classList.add('hidden');
-                renderParentsTable();
-                alert("تم تحديث البيانات بنجاح");
-            }
-        };
-
-        window.deleteCurrentParent = async () => {
-            if(!confirm("هل أنت متأكد من حذف هذه العائلة نهائياً؟ لا يمكن التراجع عن هذا الإجراء!")) return;
-            getCurrentData().parents = getCurrentData().parents.filter(p => p.id !== currentParentId);
-            await window.saveToCloud();
-            closeParentModal();
-            renderParentsTable();
-            alert("تم حذف العائلة بنجاح");
-        };
-
-        // Receipts Module
-        function initReceipts() {
-            activeParentReceipt = null;
-            document.getElementById('rec-search').value = '';
-            document.getElementById('rec-info-card').classList.add('hidden');
-            document.getElementById('rec-amount').value = '';
-            renderRecentReceipts();
-        }
-
-        window.searchParent = (q) => {
-            const res = document.getElementById('rec-results');
-            if(q.length < 2) { res.classList.add('hidden'); return; }
-            const matches = getCurrentData().parents.filter(p => p.name.includes(q));
-            res.innerHTML = matches.map(p => `
-                <div onclick="selParentReceipt(${p.id})" class="p-4 hover:bg-slate-50 border-b border-slate-100 cursor-pointer flex justify-between items-center transition">
-                    <span class="font-bold text-slate-700">${p.name}</span>
-                    <span class="text-xs font-bold ${(p.totalFees - p.paid) > 0 ? 'text-rose-500' : 'text-emerald-500'}">
-                        ${(p.totalFees - p.paid).toLocaleString()} د.ل
-                    </span>
-                </div>
-            `).join('');
-            res.classList.remove('hidden');
-        };
-
-        window.selParentReceipt = (id) => {
-            activeParentReceipt = getCurrentData().parents.find(x => x.id === id);
-            document.getElementById('rec-results').classList.add('hidden');
-            document.getElementById('rec-search').value = activeParentReceipt.name;
-            document.getElementById('rec-info-card').classList.remove('hidden');
-            document.getElementById('rec-p-name').innerText = activeParentReceipt.name;
-            document.getElementById('rec-p-id').innerText = "#" + activeParentReceipt.id.toString().slice(-4);
-            document.getElementById('rec-p-debt').innerText = (activeParentReceipt.totalFees - activeParentReceipt.paid).toLocaleString();
-            document.getElementById('rec-students-preview').innerText = activeParentReceipt.students.map(s => s.name).join('، ');
-        };
-
-        window.toggleBankInfo = () => {
-            document.getElementById('bank-field').classList.toggle('hidden', document.getElementById('rec-method').value === 'نقداً');
-        };
-
-        window.printReceipt = async () => {
-            if(!activeParentReceipt) return alert("الرجاء اختيار ولي أمر أولاً");
-            const amt = parseFloat(document.getElementById('rec-amount').value);
-            if(!amt || amt <= 0) return alert("أدخل مبلغ صحيح أكبر من صفر");
-            
-            const oldDebt = activeParentReceipt.totalFees - activeParentReceipt.paid;
-            if(amt > oldDebt) return alert("المبلغ المدخل أكبر من الدين المستحق!");
-            
-            activeParentReceipt.paid += amt;
-            
-            const txn = {
-                id: Date.now(),
-                type: 'in',
-                parentId: activeParentReceipt.id,
-                pName: activeParentReceipt.name,
-                amount: amt,
-                method: document.getElementById('rec-method').value,
-                ref: document.getElementById('rec-ref').value || '-',
-                date: new Date().toLocaleDateString('ar-LY'),
-                time: new Date().toLocaleTimeString('ar-LY'),
-                by: currentUser.name,
-                year: window.db.currentYear
-            };
-            
-            getCurrentData().transactions.push(txn);
-            await window.saveToCloud();
-            
-            // Print Template
-            const logoHTML = window.db.logo ? `<img src="${window.db.logo}" style="height:70px; float:right; margin-left:15px;">` : '';
-            document.getElementById('print-area').innerHTML = `
-                <div style="padding:20mm; font-family:Tajawal, Arial; direction:rtl; border:3px double #333; min-height:140mm; position:relative; background:#fff;">
-                    <div style="text-align:center; border-bottom:3px double #000; padding-bottom:15px; margin-bottom:25px; overflow:hidden;">
-                        ${logoHTML}
-                        <h1 style="font-size:28px; font-weight:900; margin:0; color:#000;">${window.db.schoolName}</h1>
-                        <p style="margin:8px 0; font-size:16px; color:#333;">سند قبض رسمي - العام الدراسي ${window.db.currentYear}</p>
-                    </div>
-                    
-                    <div style="display:flex; justify-content:space-between; margin-bottom:25px; font-size:14px; border:1px solid #ddd; padding:10px; border-radius:8px;">
-                        <span><b>رقم السند:</b> #${txn.id.toString().slice(-6)}</span>
-                        <span><b>التاريخ:</b> ${txn.date}</span>
-                        <span><b>الوقت:</b> ${txn.time}</span>
-                    </div>
-                    
-                    <div style="line-height:2.2; font-size:16px; margin-bottom:30px;">
-                        <p style="font-size:18px; margin-bottom:15px;"><b>استلمنا من السيد/ة:</b> <span style="border-bottom:2px dotted #999; padding:0 20px; font-weight:bold; font-size:20px;">${txn.pName}</span></p>
-                        <p style="font-size:18px; margin-bottom:15px;"><b>مبلغ وقدره:</b> <span style="background:#f0fdf4; border:2px solid #86efac; padding:5px 20px; font-weight:bold; font-size:24px; color:#059669; border-radius:8px;">${amt.toLocaleString()} د.ل</span> <span style="font-size:14px; color:#666;">فقط لا غير</span></p>
-                        <p style="font-size:16px;"><b>طريقة الدفع:</b> ${txn.method} ${txn.ref !== '-' ? '<br><span style="color:#666; font-size:14px;">(' + txn.ref + ')</span>' : ''}</p>
-                        <p style="font-size:16px; margin-top:10px;"><b>وذلك عن:</b> رسوم دراسية (${activeParentReceipt.students.length} طالب)</p>
-                    </div>
-                    
-                    <table style="width:100%; border-collapse:collapse; text-align:center; font-size:14px; margin:30px 0; border:2px solid #333;">
-                        <tr style="background:#f8fafc;">
-                            <td style="border:2px solid #333; padding:12px; font-weight:bold; width:33%;">الدين السابق</td>
-                            <td style="border:2px solid #333; padding:12px; font-weight:bold; width:33%;">المبلغ المدفوع</td>
-                            <td style="border:2px solid #333; padding:12px; font-weight:bold; width:33%;">المتبقي</td>
-                        </tr>
-                        <tr>
-                            <td style="border:2px solid #333; padding:15px; font-size:18px;">${oldDebt.toLocaleString()}</td>
-                            <td style="border:2px solid #333; padding:15px; font-size:20px; color:#059669; font-weight:bold; background:#f0fdf4;">${amt.toLocaleString()}</td>
-                            <td style="border:2px solid #333; padding:15px; font-size:18px; color:#dc2626; font-weight:bold; ${(oldDebt-amt) <= 0 ? 'color:#059669;' : ''}">${(oldDebt - amt).toLocaleString()}</td>
-                        </tr>
-                    </table>
-                    
-                    <div style="display:flex; justify-content:space-between; margin-top:60px; font-size:14px;">
-                        <div style="text-align:center; width:150px;">
-                            <div style="border-top:2px solid #000; padding-top:10px; margin-bottom:5px; font-weight:bold;">المحاسب</div>
-                            <div style="color:#666; font-size:12px;">${txn.by}</div>
-                        </div>
-                        <div style="text-align:center; width:150px;">
-                            <div style="border-top:2px solid #000; padding-top:10px; margin-bottom:5px; font-weight:bold;">توقيع المستلم</div>
-                            <div style="color:#666; font-size:12px;">${txn.pName}</div>
-                        </div>
-                    </div>
-                    
-                    <div style="position:absolute; bottom:10px; left:0; right:0; text-align:center; font-size:11px; color:#999; border-top:1px solid #eee; padding-top:10px;">
-                        تم إصدار هذا السند بواسطة النظام المالي المتكامل | ${window.db.schoolName}
-                    </div>
-                </div>
-            `;
-            document.getElementById('print-area').classList.remove('hidden');
-            window.print();
-            setTimeout(() => {
-                document.getElementById('print-area').classList.add('hidden');
-                window.goHome();
-            }, 1000);
-        };
-
-        function renderRecentReceipts() {
-            const txns = getCurrentData().transactions.filter(t => t.type === 'in').slice(-15).reverse();
-            document.getElementById('recent-receipts-list').innerHTML = txns.map(t => `
-                <li class="flex justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-md transition cursor-pointer group" onclick="document.getElementById('rec-search').value='${t.pName}'; selParentReceipt(${t.parentId}); document.getElementById('rec-amount').value=${t.amount};">
-                    <div>
-                        <span class="block font-bold text-slate-700 group-hover:text-indigo-600 transition">${t.pName}</span>
-                        <span class="text-[11px] text-slate-400 font-mono">${t.date} | ${t.by}</span>
-                    </div>
-                    <span class="font-black text-emerald-600 text-lg">${t.amount.toLocaleString()}</span>
-                </li>
-            `).join('');
-        }
-
-        window.printPayment = async () => {
-            const to = document.getElementById('pay-to').value.trim();
-            const amt = parseFloat(document.getElementById('pay-amount').value);
-            const reason = document.getElementById('pay-reason').value.trim();
-            
-            if(!to || !amt) return alert("الرجاء إدخال اسم الجهة والمبلغ");
-            
-            const txn = {
-                id: Date.now(),
-                type: 'out',
-                pName: to,
-                amount: amt,
-                category: document.getElementById('pay-cat').value,
-                reason: reason,
-                date: new Date().toLocaleDateString('ar-LY'),
-                time: new Date().toLocaleTimeString('ar-LY'),
-                by: currentUser.name,
-                year: window.db.currentYear
-            };
-            
-            getCurrentData().transactions.push(txn);
-            await window.saveToCloud();
-            
-            document.getElementById('print-area').innerHTML = `
-                <div style="padding:20mm; font-family:Tajawal, Arial; direction:rtl; border:3px double #333; min-height:140mm; background:#fff;">
-                    <div style="text-align:center; border-bottom:3px double #000; padding-bottom:15px; margin-bottom:25px;">
-                        <h1 style="font-size:28px; font-weight:900; margin:0;">سند صرف نقدي</h1>
-                        <p style="margin:8px 0; font-size:16px; color:#666;">${window.db.schoolName} - ${window.db.currentYear}</p>
-                    </div>
-                    
-                    <div style="line-height:2.5; font-size:18px;">
-                        <p><b>صرفنا للسيد/ة:</b> <span style="border-bottom:2px dotted #999; padding:0 20px; font-weight:bold; font-size:22px;">${to}</span></p>
-                        <p><b>مبلغ وقدره:</b> <span style="background:#fff1f2; border:2px solid #fda4af; padding:5px 20px; font-weight:bold; font-size:26px; color:#e11d48; border-radius:8px;">${amt.toLocaleString()} د.ل</span></p>
-                        <p><b>التصنيف:</b> ${txn.category}</p>
-                        <p><b>البيان:</b> ${reason || '---'}</p>
-                        <p><b>التاريخ:</b> ${txn.date}</p>
-                    </div>
-                    
-                    <div style="margin-top:80px; display:flex; justify-content:space-between; font-size:14px;">
-                        <div style="text-align:center; width:150px;">
-                            <div style="border-top:2px solid #000; padding-top:10px; font-weight:bold;">المحاسب</div>
-                            <div style="color:#666; font-size:12px;">${currentUser.name}</div>
-                        </div>
-                        <div style="text-align:center; width:150px;">
-                            <div style="border-top:2px solid #000; padding-top:10px; font-weight:bold;">المستلم</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('print-area').classList.remove('hidden');
-            window.print();
-            setTimeout(() => {
-                document.getElementById('print-area').classList.add('hidden');
-                window.goHome();
-            }, 1000);
-        };
-
-        function initReports() {
-            const data = getCurrentData();
-            const totalIn = data.transactions.filter(t => t.type === 'in').reduce((a,b) => a + b.amount, 0);
-            const totalOut = data.transactions.filter(t => t.type === 'out').reduce((a,b) => a + b.amount, 0);
-            const totalDebt = data.parents.reduce((a,b) => a + (b.totalFees - b.paid), 0);
-            
-            document.getElementById('rep-total-in').innerText = totalIn.toLocaleString();
-            document.getElementById('rep-total-out').innerText = totalOut.toLocaleString();
-            document.getElementById('rep-balance').innerText = (totalIn - totalOut).toLocaleString();
-            document.getElementById('rep-total-debt').innerText = totalDebt.toLocaleString();
-            
-            const debtors = data.parents.filter(p => (p.totalFees - p.paid) > 0).sort((a,b) => (b.totalFees - b.paid) - (a.totalFees - a.paid));
-            document.getElementById('report-debt-body').innerHTML = debtors.map((p, idx) => `
-                <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
-                    <td class="p-4 text-slate-400">${idx + 1}</td>
-                    <td class="p-4 font-bold text-slate-800">${p.name}</td>
-                    <td class="p-4 font-mono text-xs text-slate-500">${p.phone}</td>
-                    <td class="p-4 text-center">${p.students.length}</td>
-                    <td class="p-4 font-bold">${p.totalFees.toLocaleString()}</td>
-                    <td class="p-4 text-emerald-600 font-bold">${p.paid.toLocaleString()}</td>
-                    <td class="p-4 text-rose-600 font-black text-lg">${(p.totalFees - p.paid).toLocaleString()}</td>
-                </tr>
-            `).join('') || '<tr><td colspan="7" class="p-12 text-center text-slate-400 text-lg">لا توجد ديون مستحقة 🎉</td></tr>';
-        }
-
-        window.printReport = () => {
-            const content = document.getElementById('report-print-area').innerHTML;
-            document.getElementById('print-area').innerHTML = `
-                <div style="padding:15mm; font-family:Tajawal; direction:rtl;">
-                    <h1 style="text-align:center; margin-bottom:10px; font-size:24px; font-weight:900;">كشف الديون المستحقة</h1>
-                    <h2 style="text-align:center; margin-bottom:30px; color:#666; font-size:16px;">${window.db.schoolName} - العام الدراسي ${window.db.currentYear}</h2>
-                    ${content}
-                    <div style="margin-top:50px; text-align:center; font-size:12px; color:#999; border-top:1px solid #eee; padding-top:10px;">
-                        تم طباعة هذا التقرير بتاريخ ${new Date().toLocaleDateString('ar-LY')} بواسطة ${currentUser.name}
-                    </div>
-                </div>
-            `;
-            document.getElementById('print-area').classList.remove('hidden');
-            window.print();
-            document.getElementById('print-area').classList.add('hidden');
-        };
-
-        function initDaily() {
-            document.getElementById('daily-date-picker').valueAsDate = new Date();
-            loadDailyClosing();
-        }
-
-        window.loadDailyClosing = () => {
-            const date = new Date(document.getElementById('daily-date-picker').value);
-            document.getElementById('daily-date-display').innerText = date.toLocaleDateString('ar-LY', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
-            
-            const data = getCurrentData();
-            const dateStr = date.toLocaleDateString('ar-LY');
-            const dayTxns = data.transactions.filter(t => t.date === dateStr);
-            
-            const inTxns = dayTxns.filter(t => t.type === 'in');
-            const outTxns = dayTxns.filter(t => t.type === 'out');
-            
-            document.getElementById('daily-in-list').innerHTML = inTxns.map(t => `
-                <div class="flex justify-between text-sm border-b border-emerald-100 py-3 hover:bg-emerald-50/50 px-2 transition rounded-lg">
-                    <div>
-                        <span class="font-bold text-slate-700 block">${t.pName}</span>
-                        <span class="text-xs text-slate-400">${t.by}</span>
-                    </div>
-                    <span class="font-bold text-emerald-600">${t.amount.toLocaleString()} د.ل</span>
-                </div>
-            `).join('') || '<div class="text-center text-emerald-400 py-8 text-sm font-bold">لا توجد إيرادات هذا اليوم</div>';
-            
-            document.getElementById('daily-out-list').innerHTML = outTxns.map(t => `
-                <div class="flex justify-between text-sm border-b border-rose-100 py-3 hover:bg-rose-50/50 px-2 transition rounded-lg">
-                    <div>
-                        <span class="font-bold text-slate-700 block">${t.pName}</span>
-                        <span class="text-xs text-slate-400">${t.category}</span>
-                    </div>
-                    <span class="font-bold text-rose-600">${t.amount.toLocaleString()} د.ل</span>
-                </div>
-            `).join('') || '<div class="text-center text-rose-400 py-8 text-sm font-bold">لا توجد مصروفات هذا اليوم</div>';
-            
-            const inTotal = inTxns.reduce((a,b) => a+b.amount, 0);
-            const outTotal = outTxns.reduce((a,b) => a+b.amount, 0);
-            
-            document.getElementById('daily-in-total').innerText = inTotal.toLocaleString() + ' د.ل';
-            document.getElementById('daily-out-total').innerText = outTotal.toLocaleString() + ' د.ل';
-            document.getElementById('daily-net').innerText = (inTotal - outTotal).toLocaleString() + ' د.ل';
-            
-            const dateKey = document.getElementById('daily-date-picker').value;
-            document.getElementById('daily-notes').value = data.dailyNotes?.[dateKey] || '';
-        };
-
-        window.saveDailyNotes = async () => {
-            const date = document.getElementById('daily-date-picker').value;
-            if(!getCurrentData().dailyNotes) getCurrentData().dailyNotes = {};
-            getCurrentData().dailyNotes[date] = document.getElementById('daily-notes').value;
-            await window.saveToCloud();
-            alert("✅ تم حفظ الملاحظات بنجاح");
-        };
-
-        window.printDailyClosing = () => {
-            const content = `
-                <div style="padding:15mm; font-family:Tajawal; direction:rtl;">
-                    <h1 style="text-align:center; margin-bottom:5px; font-size:24px; font-weight:900;">تقرير الإغلاق اليومي</h1>
-                    <h2 style="text-align:center; margin-bottom:30px; color:#0891b2; font-size:18px;">${window.db.schoolName}</h2>
-                    <p style="text-align:center; margin-bottom:30px; font-weight:bold;">${document.getElementById('daily-date-display').innerText}</p>
-                    
-                    <div style="margin-bottom:30px; border:2px solid #ddd; padding:15px; border-radius:10px; background:#f0fdf4;">
-                        <h3 style="color:#059669; margin-bottom:10px;">الواردات</h3>
-                        ${document.getElementById('daily-in-list').innerHTML}
-                        <div style="margin-top:10px; font-weight:bold; text-align:left; border-top:1px dashed #059669; padding-top:5px;">
-                            الإجمالي: ${document.getElementById('daily-in-total').innerText}
-                        </div>
-                    </div>
-                    
-                    <div style="margin-bottom:30px; border:2px solid #ddd; padding:15px; border-radius:10px; background:#fff1f2;">
-                        <h3 style="color:#dc2626; margin-bottom:10px;">المصروفات</h3>
-                        ${document.getElementById('daily-out-list').innerHTML}
-                        <div style="margin-top:10px; font-weight:bold; text-align:left; border-top:1px dashed #dc2626; padding-top:5px;">
-                            الإجمالي: ${document.getElementById('daily-out-total').innerText}
-                        </div>
-                    </div>
-                    
-                    <div style="background:#ecfeff; border:3px solid #06b6d4; padding:20px; margin-top:30px; border-radius:10px;">
-                        <h2 style="text-align:center; margin:0; color:#0891b2; font-size:24px;">الصافي: ${document.getElementById('daily-net').innerText}</h2>
-                    </div>
-                    
-                    <div style="margin-top:50px; display:flex; justify-content:space-between;">
-                        <div style="text-align:center; width:150px;">
-                            <div style="border-top:2px solid #000; padding-top:10px; font-weight:bold;">المحاسب</div>
-                            <div style="color:#666; font-size:12px;">${currentUser.name}</div>
-                        </div>
-                        <div style="text-align:center; width:150px;">
-                            <div style="border-top:2px solid #000; padding-top:10px; font-weight:bold;">المدير</div>
-                            <div style="color:#666; font-size:12px;">التوقيع</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('print-area').innerHTML = content;
-            document.getElementById('print-area').classList.remove('hidden');
-            window.print();
-            document.getElementById('print-area').classList.add('hidden');
-        };
-
-        function initLogs() {
-            filterLogs();
-        }
-
-        window.filterLogs = () => {
-            const search = document.getElementById('logs-search').value.toLowerCase();
-            const filter = document.getElementById('logs-filter').value;
-            let txns = getCurrentData().transactions.slice().reverse();
-            
-            if(filter !== 'all') txns = txns.filter(t => t.type === filter);
-            if(search) txns = txns.filter(t => t.pName.toLowerCase().includes(search));
-            
-            document.getElementById('logs-table-body').innerHTML = txns.map(t => `
-                <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
-                    <td class="p-4 text-xs font-mono text-slate-400">#${t.id.toString().slice(-6)}</td>
-                    <td class="p-4 text-xs">
-                        <span class="block font-bold">${t.date}</span>
-                        <span class="text-slate-400">${t.time}</span>
-                    </td>
-                    <td class="p-4">
-                        <span class="px-3 py-1.5 rounded-lg text-xs font-bold ${t.type === 'in' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
-                            ${t.type === 'in' ? 'قبض' : 'صرف'}
-                        </span>
-                    </td>
-                    <td class="p-4 font-bold text-slate-800">${t.pName}</td>
-                    <td class="p-4 font-bold text-lg ${t.type === 'in' ? 'text-emerald-600' : 'text-rose-600'}">${t.amount.toLocaleString()}</td>
-                    <td class="p-4 text-xs font-mono text-slate-500">${t.method || t.category || '-'}</td>
-                    <td class="p-4 text-xs text-slate-500">${t.by}</td>
-                    <td class="p-4 text-center">
-                        <button onclick="alert('طباعة الفاتورة الأصلية')" class="w-8 h-8 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-lg transition flex items-center justify-center mx-auto">
-                            <i class="fa-solid fa-print text-xs"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        };
-
-        // Settings Functions
-        function initSettings() {
-            document.getElementById('set-school-name').value = window.db.schoolName;
-            if(window.db.logo) {
-                document.getElementById('logo-preview').innerHTML = `<img src="${window.db.logo}" class="w-full h-full object-contain">`;
-            }
-            renderGrades();
-            renderUsersTable();
-            
-            const yearOpts = window.db.years.map(y => `<option value="${y}">${y}</option>`).join('');
-            document.getElementById('settings-current-year').innerHTML = yearOpts;
-            document.getElementById('settings-current-year').value = window.db.currentYear;
-            document.getElementById('promote-from-year').innerHTML = yearOpts;
-            document.getElementById('promote-to-year').innerHTML = yearOpts;
-        }
-
-        window.saveIdentity = async () => {
-            window.db.schoolName = document.getElementById('set-school-name').value;
-            await window.saveToCloud();
-            document.getElementById('dash-school-name').innerText = window.db.schoolName;
-            alert("✅ تم حفظ الهوية بنجاح");
+        window.saveIdentity = async () => { 
+            window.db.schoolName = document.getElementById('set-school-name').value; 
+            await window.saveToCloud(); 
+            document.getElementById('dash-school-name').innerText = window.db.schoolName; 
+            alert("✅ تم حفظ الهوية بنجاح"); 
         };
 
         window.handleLogoUpload = (input) => {
@@ -2366,7 +1413,6 @@
             `).join('');
         }
 
-        // Users & Permissions Management
         window.togglePermissionsEditor = () => {
             const role = document.getElementById('new-u-role').value;
             const editor = document.getElementById('permissions-editor');
@@ -2387,7 +1433,7 @@
                 return;
             }
 
-            let permissions = ['all']; // Admin has all
+            let permissions = ['all'];
             if(role === 'staff') {
                 permissions = Array.from(document.querySelectorAll('.perm-check:checked')).map(cb => cb.value);
                 if(permissions.length === 0) {
@@ -2413,8 +1459,11 @@
         };
 
         function renderUsersTable() {
-            document.getElementById('users-table-body').innerHTML = window.db.users.map(u => {
-                const permText = u.role === 'admin' ? '<span class="text-emerald-600">جميع الصلاحيات</span>' : u.permissions.map(p => {
+            const tbody = document.getElementById('users-table-body');
+            if(!tbody) return;
+            
+            tbody.innerHTML = window.db.users.map(u => {
+                const permText = u.role === 'admin' ? '<span class="text-emerald-600">جميع الصلاحيات</span>' : (u.permissions || []).map(p => {
                     const labels = {receipts: 'قبض', payments: 'صرف', parents: 'عائلات', reports: 'تقارير', daily: 'إغلاق', logs: 'سجلات'};
                     return `<span class="inline-block bg-slate-100 px-2 py-1 rounded text-xs ml-1">${labels[p] || p}</span>`;
                 }).join('');
@@ -2428,7 +1477,7 @@
                             </span>
                         </td>
                         <td class="p-4 text-xs">${permText}</td>
-                        <td class="p-4 text-xs font-mono text-slate-400">${u.lastLogin}</td>
+                        <td class="p-4 text-xs font-mono text-slate-400">${u.lastLogin || '-'}</td>
                         <td class="p-4">
                             ${u.id !== currentUser?.id ? 
                                 `<button onclick="deleteUser(${u.id})" class="text-rose-500 hover:text-rose-700 text-xs font-bold bg-rose-50 px-3 py-1.5 rounded-lg transition hover:bg-rose-100">حذف</button>` : 
@@ -2486,7 +1535,6 @@
             alert(`✅ تم ترقية ${count} عائلة بنجاح`);
         };
 
-        // Backup & Restore Functions (Fixed)
         window.exportBackup = () => {
             const backupData = {
                 global: window.db,
@@ -2515,35 +1563,32 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
-                    restoreBuffer = JSON.parse(e.target.result);
-                    console.log("Backup loaded:", restoreBuffer);
+                    window.restoreBuffer = JSON.parse(e.target.result);
                 } catch(err) {
                     alert("⚠️ ملف غير صالح أو تالف");
-                    console.error(err);
                 }
             };
             reader.readAsText(file);
         };
 
         window.confirmRestore = async () => {
-            if(!restoreBuffer) {
+            if(!window.restoreBuffer) {
                 alert("الرجاء اختيار ملف النسخة الاحتياطية أولاً");
                 return;
             }
             
-            if(!confirm("⚠️ تحذير: سيتم استبدال جميع البيانات الحالية بالبيانات من النسخة الاحتياطية. هل أنت متأكد؟")) return;
+            if(!confirm("⚠️ تحذير: سيتم استبدال جميع البيانات الحالية. هل أنت متأكد؟")) return;
             if(!confirm("تأكيد نهائي: لا يمكن التراجع عن هذه العملية. متابعة؟")) return;
             
             try {
-                if(restoreBuffer.global) window.db = restoreBuffer.global;
-                if(restoreBuffer.years) window.yearData = restoreBuffer.years;
+                if(window.restoreBuffer.global) window.db = window.restoreBuffer.global;
+                if(window.restoreBuffer.years) window.yearData = window.restoreBuffer.years;
                 
                 await window.saveToCloud();
                 alert("✅ تم استرداد البيانات بنجاح! سيتم إعادة تحميل الصفحة...");
                 setTimeout(() => location.reload(), 1500);
             } catch(err) {
                 alert("❌ خطأ في استرداد البيانات");
-                console.error(err);
             }
         };
 
@@ -2592,13 +1637,107 @@
                     }
                 } catch(err) {
                     alert("❌ خطأ في استيراد الملف");
-                    console.error(err);
                 }
             };
             reader.readAsArrayBuffer(input.files[0]);
         };
 
-        // Global click handler for modals
+        window.onclick = (e) => {
+            if(e.target === document.getElementById('parent-modal')) closeParentModal();
+        };
+    </script>
+</body>
+</html>
+""")
+        window.importBackup = (input) => {
+            const file = input.files[0];
+            if(!file) return;
+            
+            document.getElementById('selected-file-name').innerText = file.name;
+            document.getElementById('restore-filename').classList.remove('hidden');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    window.restoreBuffer = JSON.parse(e.target.result);
+                } catch(err) {
+                    alert("⚠️ ملف غير صالح أو تالف");
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        window.confirmRestore = async () => {
+            if(!window.restoreBuffer) {
+                alert("الرجاء اختيار ملف النسخة الاحتياطية أولاً");
+                return;
+            }
+            
+            if(!confirm("⚠️ تحذير: سيتم استبدال جميع البيانات الحالية. هل أنت متأكد؟")) return;
+            if(!confirm("تأكيد نهائي: لا يمكن التراجع عن هذه العملية. متابعة؟")) return;
+            
+            try {
+                if(window.restoreBuffer.global) window.db = window.restoreBuffer.global;
+                if(window.restoreBuffer.years) window.yearData = window.restoreBuffer.years;
+                
+                await window.saveToCloud();
+                alert("✅ تم استرداد البيانات بنجاح! سيتم إعادة تحميل الصفحة...");
+                setTimeout(() => location.reload(), 1500);
+            } catch(err) {
+                alert("❌ خطأ في استرداد البيانات");
+            }
+        };
+
+        window.importExcel = (input) => {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const wb = XLSX.read(e.target.result, {type:'array'});
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const data = XLSX.utils.sheet_to_json(ws, {header:1});
+                    
+                    let count = 0;
+                    for(let i=1; i<data.length; i++) {
+                        const row = data[i];
+                        if(!row[0]) continue;
+                        
+                        let p = getCurrentData().parents.find(x => x.name === row[0]);
+                        if(!p) {
+                            p = {
+                                id: Date.now() + i,
+                                name: row[0],
+                                phone: row[1]?.toString() || "",
+                                students: [],
+                                totalFees: 0,
+                                paid: 0,
+                                createdAt: new Date().toLocaleDateString('ar-LY')
+                            };
+                            getCurrentData().parents.push(p);
+                        }
+                        
+                        const price = parseInt(row[5]) || 0;
+                        p.students.push({
+                            name: row[2],
+                            mother: row[3] || "-",
+                            grade: row[4] || "غير محدد",
+                            price: price
+                        });
+                        p.totalFees += price;
+                        count++;
+                    }
+                    
+                    await window.saveToCloud();
+                    alert(`✅ تم استيراد ${count} طالب بنجاح`);
+                    if(!document.getElementById('mod-parents').classList.contains('hidden')) {
+                        initParents();
+                    }
+                } catch(err) {
+                    alert("❌ خطأ في استيراد الملف");
+                }
+            };
+            reader.readAsArrayBuffer(input.files[0]);
+        };
+
         window.onclick = (e) => {
             if(e.target === document.getElementById('parent-modal')) closeParentModal();
         };
